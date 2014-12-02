@@ -8,3 +8,5 @@ add_library(sub SHARED sub.c)
 set_target_properties(sub PROPERTIES
   BUILD_WITH_INSTALL_RPATH 1
   INSTALL_NAME_DIR "@loader_path/../lib")
+
+install(TARGETS sub DESTINATION lib)

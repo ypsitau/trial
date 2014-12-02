@@ -1,0 +1,486 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 46;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		81AC4A9E19D5A69D003892F6 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 81AC4A9D19D5A69D003892F6 /* Foundation.framework */; };
+		81AC4AA019D5A69D003892F6 /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 81AC4A9F19D5A69D003892F6 /* CoreGraphics.framework */; };
+		81AC4AA219D5A69D003892F6 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 81AC4AA119D5A69D003892F6 /* UIKit.framework */; };
+		81AC4AA819D5A69D003892F6 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 81AC4AA619D5A69D003892F6 /* InfoPlist.strings */; };
+		81AC4AAA19D5A69D003892F6 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 81AC4AA919D5A69D003892F6 /* main.m */; };
+		81AC4AAE19D5A69D003892F6 /* HogeAppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 81AC4AAD19D5A69D003892F6 /* HogeAppDelegate.m */; };
+		81AC4AB119D5A69D003892F6 /* Main_iPhone.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 81AC4AAF19D5A69D003892F6 /* Main_iPhone.storyboard */; };
+		81AC4AB419D5A69D003892F6 /* Main_iPad.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 81AC4AB219D5A69D003892F6 /* Main_iPad.storyboard */; };
+		81AC4AB719D5A69D003892F6 /* HogeViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 81AC4AB619D5A69D003892F6 /* HogeViewController.m */; };
+		81AC4AB919D5A69D003892F6 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 81AC4AB819D5A69D003892F6 /* Images.xcassets */; };
+		81AC4AC019D5A69D003892F6 /* XCTest.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 81AC4ABF19D5A69D003892F6 /* XCTest.framework */; };
+		81AC4AC119D5A69D003892F6 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 81AC4A9D19D5A69D003892F6 /* Foundation.framework */; };
+		81AC4AC219D5A69D003892F6 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 81AC4AA119D5A69D003892F6 /* UIKit.framework */; };
+		81AC4ACA19D5A69D003892F6 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 81AC4AC819D5A69D003892F6 /* InfoPlist.strings */; };
+		81AC4ACC19D5A69D003892F6 /* HogeTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 81AC4ACB19D5A69D003892F6 /* HogeTests.m */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		81AC4AC319D5A69D003892F6 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 81AC4A9219D5A69D003892F6 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 81AC4A9919D5A69D003892F6;
+			remoteInfo = Hoge;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXFileReference section */
+		81AC4A9A19D5A69D003892F6 /* Hoge.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Hoge.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		81AC4A9D19D5A69D003892F6 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
+		81AC4A9F19D5A69D003892F6 /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
+		81AC4AA119D5A69D003892F6 /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
+		81AC4AA519D5A69D003892F6 /* Hoge-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "Hoge-Info.plist"; sourceTree = "<group>"; };
+		81AC4AA719D5A69D003892F6 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
+		81AC4AA919D5A69D003892F6 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
+		81AC4AAB19D5A69D003892F6 /* Hoge-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Hoge-Prefix.pch"; sourceTree = "<group>"; };
+		81AC4AAC19D5A69D003892F6 /* HogeAppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = HogeAppDelegate.h; sourceTree = "<group>"; };
+		81AC4AAD19D5A69D003892F6 /* HogeAppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = HogeAppDelegate.m; sourceTree = "<group>"; };
+		81AC4AB019D5A69D003892F6 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main_iPhone.storyboard; sourceTree = "<group>"; };
+		81AC4AB319D5A69D003892F6 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main_iPad.storyboard; sourceTree = "<group>"; };
+		81AC4AB519D5A69D003892F6 /* HogeViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = HogeViewController.h; sourceTree = "<group>"; };
+		81AC4AB619D5A69D003892F6 /* HogeViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = HogeViewController.m; sourceTree = "<group>"; };
+		81AC4AB819D5A69D003892F6 /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
+		81AC4ABE19D5A69D003892F6 /* HogeTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = HogeTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		81AC4ABF19D5A69D003892F6 /* XCTest.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = XCTest.framework; path = Library/Frameworks/XCTest.framework; sourceTree = DEVELOPER_DIR; };
+		81AC4AC719D5A69D003892F6 /* HogeTests-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "HogeTests-Info.plist"; sourceTree = "<group>"; };
+		81AC4AC919D5A69D003892F6 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
+		81AC4ACB19D5A69D003892F6 /* HogeTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = HogeTests.m; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		81AC4A9719D5A69D003892F6 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				81AC4AA019D5A69D003892F6 /* CoreGraphics.framework in Frameworks */,
+				81AC4AA219D5A69D003892F6 /* UIKit.framework in Frameworks */,
+				81AC4A9E19D5A69D003892F6 /* Foundation.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		81AC4ABB19D5A69D003892F6 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				81AC4AC019D5A69D003892F6 /* XCTest.framework in Frameworks */,
+				81AC4AC219D5A69D003892F6 /* UIKit.framework in Frameworks */,
+				81AC4AC119D5A69D003892F6 /* Foundation.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		81AC4A9119D5A69D003892F6 = {
+			isa = PBXGroup;
+			children = (
+				81AC4AA319D5A69D003892F6 /* Hoge */,
+				81AC4AC519D5A69D003892F6 /* HogeTests */,
+				81AC4A9C19D5A69D003892F6 /* Frameworks */,
+				81AC4A9B19D5A69D003892F6 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		81AC4A9B19D5A69D003892F6 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				81AC4A9A19D5A69D003892F6 /* Hoge.app */,
+				81AC4ABE19D5A69D003892F6 /* HogeTests.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		81AC4A9C19D5A69D003892F6 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				81AC4A9D19D5A69D003892F6 /* Foundation.framework */,
+				81AC4A9F19D5A69D003892F6 /* CoreGraphics.framework */,
+				81AC4AA119D5A69D003892F6 /* UIKit.framework */,
+				81AC4ABF19D5A69D003892F6 /* XCTest.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		81AC4AA319D5A69D003892F6 /* Hoge */ = {
+			isa = PBXGroup;
+			children = (
+				81AC4AAC19D5A69D003892F6 /* HogeAppDelegate.h */,
+				81AC4AAD19D5A69D003892F6 /* HogeAppDelegate.m */,
+				81AC4AAF19D5A69D003892F6 /* Main_iPhone.storyboard */,
+				81AC4AB219D5A69D003892F6 /* Main_iPad.storyboard */,
+				81AC4AB519D5A69D003892F6 /* HogeViewController.h */,
+				81AC4AB619D5A69D003892F6 /* HogeViewController.m */,
+				81AC4AB819D5A69D003892F6 /* Images.xcassets */,
+				81AC4AA419D5A69D003892F6 /* Supporting Files */,
+			);
+			path = Hoge;
+			sourceTree = "<group>";
+		};
+		81AC4AA419D5A69D003892F6 /* Supporting Files */ = {
+			isa = PBXGroup;
+			children = (
+				81AC4AA519D5A69D003892F6 /* Hoge-Info.plist */,
+				81AC4AA619D5A69D003892F6 /* InfoPlist.strings */,
+				81AC4AA919D5A69D003892F6 /* main.m */,
+				81AC4AAB19D5A69D003892F6 /* Hoge-Prefix.pch */,
+			);
+			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
+		81AC4AC519D5A69D003892F6 /* HogeTests */ = {
+			isa = PBXGroup;
+			children = (
+				81AC4ACB19D5A69D003892F6 /* HogeTests.m */,
+				81AC4AC619D5A69D003892F6 /* Supporting Files */,
+			);
+			path = HogeTests;
+			sourceTree = "<group>";
+		};
+		81AC4AC619D5A69D003892F6 /* Supporting Files */ = {
+			isa = PBXGroup;
+			children = (
+				81AC4AC719D5A69D003892F6 /* HogeTests-Info.plist */,
+				81AC4AC819D5A69D003892F6 /* InfoPlist.strings */,
+			);
+			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		81AC4A9919D5A69D003892F6 /* Hoge */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 81AC4ACF19D5A69D003892F6 /* Build configuration list for PBXNativeTarget "Hoge" */;
+			buildPhases = (
+				81AC4A9619D5A69D003892F6 /* Sources */,
+				81AC4A9719D5A69D003892F6 /* Frameworks */,
+				81AC4A9819D5A69D003892F6 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = Hoge;
+			productName = Hoge;
+			productReference = 81AC4A9A19D5A69D003892F6 /* Hoge.app */;
+			productType = "com.apple.product-type.application";
+		};
+		81AC4ABD19D5A69D003892F6 /* HogeTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 81AC4AD219D5A69D003892F6 /* Build configuration list for PBXNativeTarget "HogeTests" */;
+			buildPhases = (
+				81AC4ABA19D5A69D003892F6 /* Sources */,
+				81AC4ABB19D5A69D003892F6 /* Frameworks */,
+				81AC4ABC19D5A69D003892F6 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				81AC4AC419D5A69D003892F6 /* PBXTargetDependency */,
+			);
+			name = HogeTests;
+			productName = HogeTests;
+			productReference = 81AC4ABE19D5A69D003892F6 /* HogeTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		81AC4A9219D5A69D003892F6 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				CLASSPREFIX = Hoge;
+				LastUpgradeCheck = 0510;
+				ORGANIZATIONNAME = "___FULLUSERNAME___";
+				TargetAttributes = {
+					81AC4ABD19D5A69D003892F6 = {
+						TestTargetID = 81AC4A9919D5A69D003892F6;
+					};
+				};
+			};
+			buildConfigurationList = 81AC4A9519D5A69D003892F6 /* Build configuration list for PBXProject "Hoge" */;
+			compatibilityVersion = "Xcode 3.2";
+			developmentRegion = English;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = 81AC4A9119D5A69D003892F6;
+			productRefGroup = 81AC4A9B19D5A69D003892F6 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				81AC4A9919D5A69D003892F6 /* Hoge */,
+				81AC4ABD19D5A69D003892F6 /* HogeTests */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		81AC4A9819D5A69D003892F6 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				81AC4AB419D5A69D003892F6 /* Main_iPad.storyboard in Resources */,
+				81AC4AB919D5A69D003892F6 /* Images.xcassets in Resources */,
+				81AC4AB119D5A69D003892F6 /* Main_iPhone.storyboard in Resources */,
+				81AC4AA819D5A69D003892F6 /* InfoPlist.strings in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		81AC4ABC19D5A69D003892F6 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				81AC4ACA19D5A69D003892F6 /* InfoPlist.strings in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		81AC4A9619D5A69D003892F6 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				81AC4AAA19D5A69D003892F6 /* main.m in Sources */,
+				81AC4AB719D5A69D003892F6 /* HogeViewController.m in Sources */,
+				81AC4AAE19D5A69D003892F6 /* HogeAppDelegate.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		81AC4ABA19D5A69D003892F6 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				81AC4ACC19D5A69D003892F6 /* HogeTests.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		81AC4AC419D5A69D003892F6 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 81AC4A9919D5A69D003892F6 /* Hoge */;
+			targetProxy = 81AC4AC319D5A69D003892F6 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin PBXVariantGroup section */
+		81AC4AA619D5A69D003892F6 /* InfoPlist.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				81AC4AA719D5A69D003892F6 /* en */,
+			);
+			name = InfoPlist.strings;
+			sourceTree = "<group>";
+		};
+		81AC4AAF19D5A69D003892F6 /* Main_iPhone.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				81AC4AB019D5A69D003892F6 /* Base */,
+			);
+			name = Main_iPhone.storyboard;
+			sourceTree = "<group>";
+		};
+		81AC4AB219D5A69D003892F6 /* Main_iPad.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				81AC4AB319D5A69D003892F6 /* Base */,
+			);
+			name = Main_iPad.storyboard;
+			sourceTree = "<group>";
+		};
+		81AC4AC819D5A69D003892F6 /* InfoPlist.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				81AC4AC919D5A69D003892F6 /* en */,
+			);
+			name = InfoPlist.strings;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
+
+/* Begin XCBuildConfiguration section */
+		81AC4ACD19D5A69D003892F6 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				COPY_PHASE_STRIP = NO;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 7.1;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		81AC4ACE19D5A69D003892F6 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				COPY_PHASE_STRIP = YES;
+				ENABLE_NS_ASSERTIONS = NO;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 7.1;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		81AC4AD019D5A69D003892F6 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "Hoge/Hoge-Prefix.pch";
+				INFOPLIST_FILE = "Hoge/Hoge-Info.plist";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				WRAPPER_EXTENSION = app;
+			};
+			name = Debug;
+		};
+		81AC4AD119D5A69D003892F6 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "Hoge/Hoge-Prefix.pch";
+				INFOPLIST_FILE = "Hoge/Hoge-Info.plist";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				WRAPPER_EXTENSION = app;
+			};
+			name = Release;
+		};
+		81AC4AD319D5A69D003892F6 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(BUILT_PRODUCTS_DIR)/Hoge.app/Hoge";
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(SDKROOT)/Developer/Library/Frameworks",
+					"$(inherited)",
+					"$(DEVELOPER_FRAMEWORKS_DIR)",
+				);
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "Hoge/Hoge-Prefix.pch";
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				INFOPLIST_FILE = "HogeTests/HogeTests-Info.plist";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				TEST_HOST = "$(BUNDLE_LOADER)";
+				WRAPPER_EXTENSION = xctest;
+			};
+			name = Debug;
+		};
+		81AC4AD419D5A69D003892F6 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(BUILT_PRODUCTS_DIR)/Hoge.app/Hoge";
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(SDKROOT)/Developer/Library/Frameworks",
+					"$(inherited)",
+					"$(DEVELOPER_FRAMEWORKS_DIR)",
+				);
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "Hoge/Hoge-Prefix.pch";
+				INFOPLIST_FILE = "HogeTests/HogeTests-Info.plist";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				TEST_HOST = "$(BUNDLE_LOADER)";
+				WRAPPER_EXTENSION = xctest;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		81AC4A9519D5A69D003892F6 /* Build configuration list for PBXProject "Hoge" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				81AC4ACD19D5A69D003892F6 /* Debug */,
+				81AC4ACE19D5A69D003892F6 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		81AC4ACF19D5A69D003892F6 /* Build configuration list for PBXNativeTarget "Hoge" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				81AC4AD019D5A69D003892F6 /* Debug */,
+				81AC4AD119D5A69D003892F6 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+		};
+		81AC4AD219D5A69D003892F6 /* Build configuration list for PBXNativeTarget "HogeTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				81AC4AD319D5A69D003892F6 /* Debug */,
+				81AC4AD419D5A69D003892F6 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 81AC4A9219D5A69D003892F6 /* Project object */;
+}
