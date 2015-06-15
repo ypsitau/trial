@@ -1,8 +1,0 @@
-generator: generator.o
-	g++ -o $@ `~/tools/clang/bin/llvm-config --ldflags --libs` $+ -lcurses
-
-generator.o: generator.cpp
-	g++ `~/tools/clang/bin/llvm-config --cxxflags` -c $<
-
-helloworld.s: helloworld.cpp
-	llvm-gcc helloworld.cpp -S -emit-llvm
