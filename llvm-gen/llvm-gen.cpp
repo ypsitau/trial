@@ -3,6 +3,7 @@
 #include "llvm/IR/Module.h"
 #include "llvm/IR/Function.h"
 #include "llvm/IR/BasicBlock.h"
+#include "llvm/ExecutionEngine/ExecutionEngine.h"
 
 #include "llvm/IR/IRBuilder.h"
 #include <vector>
@@ -42,4 +43,17 @@ int main()
 
 	builder.CreateRetVoid();
 	pModule->dump();
+#if 0
+	do {
+		llvm::ExecutionEngine *pExecutionEngine =
+			llvm::EngineBuilder(std::unique_ptr<llvm::Module>(pModule)).create();
+		::printf("%p\n", pExecutionEngine);
+		pExecutionEngine->finalizeObject();
+		llvm::Function *pFunction = pExecutionEngine->FindFunctionNamed("main");
+		::printf("%p\n", pFunction);
+		void *fp = pExecutionEngine->getPointerToFunction(pFunction);
+		::printf("%p\n", fp);
+	} while (0);
+#endif
+	return 0;
 }
