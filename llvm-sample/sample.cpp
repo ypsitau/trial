@@ -1,4 +1,4 @@
-int func()
+float func(float a, float b)
 {
-	return 0;
+	return a + b;
 }
