@@ -26,20 +26,20 @@ int main()
 		std::vector<llvm::Type *> argTypes;
 		argTypes.push_back(builder.getInt8Ty()->getPointerTo());
 		llvm::ArrayRef<llvm::Type *> argTypesRef(argTypes);
-		llvm::FunctionType *funcType = 
+		llvm::FunctionType *pFunctionType = 
 			llvm::FunctionType::get(builder.getInt32Ty(), argTypesRef, false);
-		llvm::Constant *func = pModule->getOrInsertFunction("puts", funcType);
+		llvm::Constant *pConstant = pModule->getOrInsertFunction("puts", pFunctionType);
+		builder.CreateCall(pConstant, builder.CreateGlobalStringPtr("hello world!\n"));
+	} while (0);
 
+	do {
 		//std::vector<llvm::Value *> argValues;
 		//argValues.push_back(builder.CreateGlobalStringPtr("hello world!\n"));
 		//argValues.push_back(builder.CreateGlobalStringPtr("hello world!\n"));
 		//llvm::ArrayRef<llvm::Value *> argValuesRef(argValues);
 		//builder.CreateCall(func, argValuesRef);
-
-		builder.CreateCall(func, builder.CreateGlobalStringPtr("hello world!\n"));
 	} while (0);
 
 	builder.CreateRetVoid();
-
 	pModule->dump();
 }
