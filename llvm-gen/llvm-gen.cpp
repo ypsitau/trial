@@ -4,10 +4,13 @@
 #include "llvm/IR/Function.h"
 #include "llvm/IR/BasicBlock.h"
 #include "llvm/ExecutionEngine/ExecutionEngine.h"
+#include "llvm/Bitcode/ReaderWriter.h"
+#include "llvm/Support/raw_os_ostream.h"
 
 #include "llvm/IR/IRBuilder.h"
 #include <vector>
 #include <string>
+#include <iostream>
 
 int main()
 {
@@ -23,6 +26,13 @@ int main()
 		builder.SetInsertPoint(pBasicBlock);
 	} while (0);
 
+	do {
+		llvm::Value *pPointer = builder.CreateAlloca(llvm::Type::getInt32Ty(context), 0, "x");
+		builder.CreateStore(llvm::ConstantInt::get(llvm::Type::getInt32Ty(context), 123),
+							pPointer);
+		builder.CreateLoad(pPointer);
+	} while (0);
+	
 	do {
 		std::vector<llvm::Type *> argTypes;
 		argTypes.push_back(builder.getInt8Ty()->getPointerTo());
@@ -40,9 +50,13 @@ int main()
 		//llvm::ArrayRef<llvm::Value *> argValuesRef(argValues);
 		//builder.CreateCall(func, argValuesRef);
 	} while (0);
-
 	builder.CreateRetVoid();
-	pModule->dump();
+	//pModule->dump();
+	do {
+		//llvm::raw_os_ostream out(std::cout);	
+		//llvm::WriteBitcodeToFile(pModule, out);
+		//out.close();
+	} while (0);
 #if 0
 	do {
 		llvm::ExecutionEngine *pExecutionEngine =
