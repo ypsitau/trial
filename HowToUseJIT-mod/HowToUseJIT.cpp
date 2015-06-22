@@ -56,45 +56,40 @@ int main()
 		llvm::Function *pFunction = llvm::cast<llvm::Function>(
 			pModule->getOrInsertFunction(
 				"add1",
-				llvm::Type::getInt32Ty(context),
-				llvm::Type::getInt32Ty(context),
-				(llvm::Type *)0));
+				llvm::Type::getInt32Ty(context),	// return type
+				llvm::Type::getInt32Ty(context),	// argument type #1
+				nullptr));
 		llvm::BasicBlock *pBasicBlock = llvm::BasicBlock::Create(context, "EntryBlock", pFunction);
 		llvm::IRBuilder<> builder(pBasicBlock);
-		
-		assert(pFunction->arg_begin() != pFunction->arg_end()); // Make sure there's an arg
-		llvm::Argument *pArgument = pFunction->arg_begin();  // Get the arg
+		llvm::Argument *pArgument = pFunction->arg_begin();
 		pArgument->setName("AnArg");
-		// Create the add instruction, inserting it into the end of pBasicBlock.
 		llvm::Value *Add = builder.CreateAdd(builder.getInt32(1), pArgument);
-		// Create the return instruction and add it to the basic block
 		builder.CreateRet(Add);
 	} while (0);
 	do {
 		llvm::Function *pFunction = llvm::cast<llvm::Function>(
 			pModule->getOrInsertFunction(
 				"foo",
-				llvm::Type::getInt32Ty(context),
-				(llvm::Type *)0));
+				llvm::Type::getInt32Ty(context),	// return type
+				nullptr));
 		llvm::BasicBlock *pBasicBlock = llvm::BasicBlock::Create(context, "EntryBlock", pFunction);
 		llvm::IRBuilder<> builder(pBasicBlock);
 		llvm::CallInst *pCallInst = builder.CreateCall(
 			pModule->getFunction("add1"), builder.getInt32(10));
 		pCallInst->setTailCall(true);
-		// Create the return instruction and add it to the basic block.
 		builder.CreateRet(pCallInst);
 	} while (0);
 	llvm::outs() << "We just constructed this LLVM module:\n\n" << *pModule;
 	llvm::outs() << "\n\nRunning foo: ";
 	llvm::outs().flush();
-
-	// Now we create the JIT.
-	llvm::ExecutionEngine *pExecutionEngine = llvm::EngineBuilder(std::move(pModule)).create();
-	std::vector<llvm::GenericValue> noargs;
-	llvm::GenericValue gv = pExecutionEngine->runFunction(
-		pExecutionEngine->FindFunctionNamed("foo"), noargs);
-	llvm::outs() << "Result: " << gv.IntVal << "\n";
-	delete pExecutionEngine;
+	do {
+		std::unique_ptr<llvm::ExecutionEngine> pExecutionEngine(
+			llvm::EngineBuilder(std::move(pModule)).create());
+		std::vector<llvm::GenericValue> args;
+		llvm::GenericValue genericValue = pExecutionEngine->runFunction(
+			pExecutionEngine->FindFunctionNamed("foo"), args);
+		llvm::outs() << "Result: " << genericValue.IntVal << "\n";
+	} while (0);
 	llvm::llvm_shutdown();
 	return 0;
 }
