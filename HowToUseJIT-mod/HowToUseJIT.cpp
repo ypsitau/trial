@@ -61,7 +61,7 @@ int main()
 	// function will have a return type of "int" and take an argument of "int".
 	// The '0' terminates the list of argument types.
 	llvm::Function *Add1F =
-		llvm::cast<llvm::Function>(M->getOrInsertFunction("add1", llvm::Type::getInt32Ty(Context),
+		llvm::cast<llvm::Function>(pModule->getOrInsertFunction("add1", llvm::Type::getInt32Ty(Context),
 													llvm::Type::getInt32Ty(Context),
 													(llvm::Type *)0));
 
@@ -93,7 +93,7 @@ int main()
 	// Now we're going to create function `foo', which returns an int and takes no
 	// arguments.
 	llvm::Function *FooF =
-		llvm::cast<llvm::Function>(M->getOrInsertFunction("foo", llvm::Type::getInt32Ty(Context),
+		llvm::cast<llvm::Function>(pModule->getOrInsertFunction("foo", llvm::Type::getInt32Ty(Context),
 													(llvm::Type *)0));
 
 	// Add a basic block to the FooF function.
