@@ -54,8 +54,8 @@ int main()
 	llvm::LLVMContext Context;
   
 	// Create some module to put our function into it.
-	std::unique_ptr<llvm::Module> Owner = llvm::make_unique<llvm::Module>("test", Context);
-	llvm::Module *M = Owner.get();
+	std::unique_ptr<llvm::Module> pModule = llvm::make_unique<llvm::Module>("test", Context);
+	llvm::Module *M = pModule.get();
 
 	// Create the add1 function entry and insert this entry into module M.  The
 	// function will have a return type of "int" and take an argument of "int".
@@ -67,11 +67,11 @@ int main()
 
 	// Add a basic block to the function. As before, it automatically inserts
 	// because of the last argument.
-	llvm::BasicBlock *BB = llvm::BasicBlock::Create(Context, "EntryBlock", Add1F);
+	llvm::BasicBlock *pBasicBlock = llvm::BasicBlock::Create(Context, "EntryBlock", Add1F);
 
 	// Create a basic block builder with default parameters.  The builder will
-	// automatically append instructions to the basic block `BB'.
-	llvm::IRBuilder<> builder(BB);
+	// automatically append instructions to the basic block `pBasicBlock'.
+	llvm::IRBuilder<> builder(pBasicBlock);
 
 	// Get pointers to the constant `1'.
 	llvm::Value *One = builder.getInt32(1);
@@ -81,7 +81,7 @@ int main()
 	llvm::Argument *ArgX = Add1F->arg_begin();  // Get the arg
 	ArgX->setName("AnArg");            // Give it a nice symbolic name for fun.
 
-	// Create the add instruction, inserting it into the end of BB.
+	// Create the add instruction, inserting it into the end of pBasicBlock.
 	llvm::Value *Add = builder.CreateAdd(One, ArgX);
 
 	// Create the return instruction and add it to the basic block
@@ -97,10 +97,10 @@ int main()
 													(llvm::Type *)0));
 
 	// Add a basic block to the FooF function.
-	BB = llvm::BasicBlock::Create(Context, "EntryBlock", FooF);
+	pBasicBlock = llvm::BasicBlock::Create(Context, "EntryBlock", FooF);
 
 	// Tell the basic block builder to attach itself to the new basic block
-	builder.SetInsertPoint(BB);
+	builder.SetInsertPoint(pBasicBlock);
 
 	// Get pointer to the constant `10'.
 	llvm::Value *Ten = builder.getInt32(10);
@@ -113,7 +113,7 @@ int main()
 	builder.CreateRet(Add1CallRes);
 
 	// Now we create the JIT.
-	llvm::ExecutionEngine* EE = llvm::EngineBuilder(std::move(Owner)).create();
+	llvm::ExecutionEngine* EE = llvm::EngineBuilder(std::move(pModule)).create();
 
 	llvm::outs() << "We just constructed this LLVM module:\n\n" << *M;
 	llvm::outs() << "\n\nRunning foo: ";
