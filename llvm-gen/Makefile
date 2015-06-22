@@ -1,11 +1,5 @@
-HowToUseJIT: HowToUseJIT.o
-	g++ -o $@ `~/tools/clang/bin/llvm-config --ldflags --libs` $+ -lcurses -lz
-
-HowToUseJIT.o: HowToUseJIT.cpp
-	g++ `~/tools/clang/bin/llvm-config --cxxflags` -c $<
-
 llvm-gen: llvm-gen.o
-	g++ -o $@ `~/tools/clang/bin/llvm-config --ldflags --libs` $+ -lcurses
+	g++ -o $@ `~/tools/clang/bin/llvm-config --ldflags --libs` $+ -lcurses -lz
 
 llvm-gen.o: llvm-gen.cpp
 	g++ `~/tools/clang/bin/llvm-config --cxxflags` -c $<
