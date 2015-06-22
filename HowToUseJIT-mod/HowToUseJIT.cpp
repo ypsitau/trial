@@ -52,30 +52,39 @@ int main()
 	llvm::InitializeNativeTarget();
 	llvm::LLVMContext context;
 	std::unique_ptr<llvm::Module> pModule = llvm::make_unique<llvm::Module>("test", context);
+	llvm::IRBuilder<> builder(context);
 	do {
+		/*
+		llvm::Function *pFunction = llvm::cast<llvm::Function>(
+			pModule->getOrInsertFunction(
+				"foo",
+				llvm::FunctionType::get(llvm::Type::getInt32Ty(context), false)));
+		*/
 		llvm::Function *pFunction = llvm::cast<llvm::Function>(
 			pModule->getOrInsertFunction(
 				"add1",
-				llvm::Type::getInt32Ty(context),	// return type
-				llvm::Type::getInt32Ty(context),	// argument type #1
+				builder.getInt32Ty(),	// return type
+				builder.getInt32Ty(),	// argument type #1
 				nullptr));
-		llvm::BasicBlock *pBasicBlock = llvm::BasicBlock::Create(context, "EntryBlock", pFunction);
-		llvm::IRBuilder<> builder(pBasicBlock);
+		llvm::BasicBlock *pBasicBlock = llvm::BasicBlock::Create(context, "entrypoint", pFunction);
+		builder.SetInsertPoint(pBasicBlock);
 		llvm::Argument *pArgument = pFunction->arg_begin();
-		pArgument->setName("AnArg");
-		llvm::Value *Add = builder.CreateAdd(builder.getInt32(1), pArgument);
-		builder.CreateRet(Add);
+		//pArgument->setName("AnArg");
+		llvm::Value *pValue = builder.CreateAdd(
+			builder.getInt32(1),
+			pArgument);
+		builder.CreateRet(pValue);
 	} while (0);
 	do {
 		llvm::Function *pFunction = llvm::cast<llvm::Function>(
 			pModule->getOrInsertFunction(
 				"foo",
-				llvm::Type::getInt32Ty(context),	// return type
-				nullptr));
-		llvm::BasicBlock *pBasicBlock = llvm::BasicBlock::Create(context, "EntryBlock", pFunction);
-		llvm::IRBuilder<> builder(pBasicBlock);
+				llvm::FunctionType::get(builder.getInt32Ty(), false)));
+		llvm::BasicBlock *pBasicBlock = llvm::BasicBlock::Create(context, "entrypoint", pFunction);
+		builder.SetInsertPoint(pBasicBlock);
 		llvm::CallInst *pCallInst = builder.CreateCall(
-			pModule->getFunction("add1"), builder.getInt32(10));
+			pModule->getFunction("add1"),
+			builder.getInt32(10));
 		pCallInst->setTailCall(true);
 		builder.CreateRet(pCallInst);
 	} while (0);
