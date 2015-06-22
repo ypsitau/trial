@@ -54,18 +54,21 @@ int main()
 	std::unique_ptr<llvm::Module> pModule = llvm::make_unique<llvm::Module>("test", context);
 	llvm::IRBuilder<> builder(context);
 	do {
+#if 0
+		std::vector<llvm::Type *> argTypes;
+		argTypes.push_back(builder.getInt32Ty());
+		llvm::ArrayRef<llvm::Type *> argTypesRef(argTypes);
 		llvm::Function *pFunction = llvm::cast<llvm::Function>(
 			pModule->getOrInsertFunction(
 				"add1",
-				llvm::FunctionType::get(builder.getInt32Ty(), false)));
-#if 0
+				llvm::FunctionType::get(builder.getInt32Ty(), argTypesRef, false)));
+#endif
 		llvm::Function *pFunction = llvm::cast<llvm::Function>(
 			pModule->getOrInsertFunction(
 				"add1",
 				builder.getInt32Ty(),	// return type
 				builder.getInt32Ty(),	// argument type #1
 				nullptr));
-#endif
 		llvm::BasicBlock *pBasicBlock = llvm::BasicBlock::Create(context, "entrypoint", pFunction);
 		builder.SetInsertPoint(pBasicBlock);
 		llvm::Argument *pArgument = pFunction->arg_begin();
