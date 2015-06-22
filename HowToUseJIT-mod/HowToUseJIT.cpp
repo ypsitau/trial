@@ -56,39 +56,24 @@ int main()
 	// Create some module to put our function into it.
 	std::unique_ptr<llvm::Module> pModule = llvm::make_unique<llvm::Module>("test", context);
 
-	// Create the add1 function entry and insert this entry into module M.  The
-	// function will have a return type of "int" and take an argument of "int".
-	// The '0' terminates the list of argument types.
 	llvm::Function *pFunction = llvm::cast<llvm::Function>(pModule->getOrInsertFunction(
 									   "add1",
 									   llvm::Type::getInt32Ty(context),
 									   llvm::Type::getInt32Ty(context),
 									   (llvm::Type *)0));
-
-	// Add a basic block to the function. As before, it automatically inserts
-	// because of the last argument.
 	llvm::BasicBlock *pBasicBlock = llvm::BasicBlock::Create(context, "EntryBlock", pFunction);
-
-	// Create a basic block builder with default parameters.  The builder will
-	// automatically append instructions to the basic block `pBasicBlock'.
 	llvm::IRBuilder<> builder(pBasicBlock);
-
-	// Get pointers to the constant `1'.
 	llvm::Value *One = builder.getInt32(1);
 
-	// Get pointers to the integer argument of the add1 function...
 	assert(pFunction->arg_begin() != pFunction->arg_end()); // Make sure there's an arg
 	llvm::Argument *ArgX = pFunction->arg_begin();  // Get the arg
 	ArgX->setName("AnArg");            // Give it a nice symbolic name for fun.
-
 	// Create the add instruction, inserting it into the end of pBasicBlock.
 	llvm::Value *Add = builder.CreateAdd(One, ArgX);
-
 	// Create the return instruction and add it to the basic block
 	builder.CreateRet(Add);
 
 	// Now, function add1 is ready.
-
 
 	// Now we're going to create function `foo', which returns an int and takes no
 	// arguments.
@@ -106,11 +91,11 @@ int main()
 	llvm::Value *Ten = builder.getInt32(10);
 
 	// Pass Ten to the call to Add1F
-	llvm::CallInst *Add1CallRes = builder.CreateCall(pFunction, Ten);
-	Add1CallRes->setTailCall(true);
+	llvm::CallInst *pCallInst = builder.CreateCall(pFunction, Ten);
+	pCallInst->setTailCall(true);
 
 	// Create the return instruction and add it to the basic block.
-	builder.CreateRet(Add1CallRes);
+	builder.CreateRet(pCallInst);
 
 	llvm::outs() << "We just constructed this LLVM module:\n\n" << *pModule;
 	llvm::outs() << "\n\nRunning foo: ";
