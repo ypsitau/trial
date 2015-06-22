@@ -56,42 +56,39 @@ int main()
 	// Create some module to put our function into it.
 	std::unique_ptr<llvm::Module> pModule = llvm::make_unique<llvm::Module>("test", context);
 
-	llvm::Function *pFunction = llvm::cast<llvm::Function>(pModule->getOrInsertFunction(
-									   "add1",
-									   llvm::Type::getInt32Ty(context),
-									   llvm::Type::getInt32Ty(context),
-									   (llvm::Type *)0));
-	llvm::BasicBlock *pBasicBlock = llvm::BasicBlock::Create(context, "EntryBlock", pFunction);
-	llvm::IRBuilder<> builder(pBasicBlock);
-	llvm::Value *One = builder.getInt32(1);
+	do {
+		llvm::Function *pFunction = llvm::cast<llvm::Function>(
+			pModule->getOrInsertFunction(
+				"add1",
+				llvm::Type::getInt32Ty(context),
+				llvm::Type::getInt32Ty(context),
+				(llvm::Type *)0));
+		llvm::BasicBlock *pBasicBlock = llvm::BasicBlock::Create(context, "EntryBlock", pFunction);
+		llvm::IRBuilder<> builder(pBasicBlock);
+		
+		assert(pFunction->arg_begin() != pFunction->arg_end()); // Make sure there's an arg
+		llvm::Argument *pArgument = pFunction->arg_begin();  // Get the arg
+		pArgument->setName("AnArg");
+		// Create the add instruction, inserting it into the end of pBasicBlock.
+		llvm::Value *Add = builder.CreateAdd(builder.getInt32(1), pArgument);
+		// Create the return instruction and add it to the basic block
+		builder.CreateRet(Add);
+	} while (0);
 
-	assert(pFunction->arg_begin() != pFunction->arg_end()); // Make sure there's an arg
-	llvm::Argument *ArgX = pFunction->arg_begin();  // Get the arg
-	ArgX->setName("AnArg");            // Give it a nice symbolic name for fun.
-	// Create the add instruction, inserting it into the end of pBasicBlock.
-	llvm::Value *Add = builder.CreateAdd(One, ArgX);
-	// Create the return instruction and add it to the basic block
-	builder.CreateRet(Add);
-
-	// Now, function add1 is ready.
-
-	// Now we're going to create function `foo', which returns an int and takes no
-	// arguments.
 	llvm::Function *FooF =
 		llvm::cast<llvm::Function>(pModule->getOrInsertFunction("foo", llvm::Type::getInt32Ty(context),
 													(llvm::Type *)0));
 
 	// Add a basic block to the FooF function.
-	pBasicBlock = llvm::BasicBlock::Create(context, "EntryBlock", FooF);
+	llvm::BasicBlock *pBasicBlock = llvm::BasicBlock::Create(context, "EntryBlock", FooF);
 
-	// Tell the basic block builder to attach itself to the new basic block
-	builder.SetInsertPoint(pBasicBlock);
+	llvm::IRBuilder<> builder(pBasicBlock);
 
 	// Get pointer to the constant `10'.
 	llvm::Value *Ten = builder.getInt32(10);
 
 	// Pass Ten to the call to Add1F
-	llvm::CallInst *pCallInst = builder.CreateCall(pFunction, Ten);
+	llvm::CallInst *pCallInst = builder.CreateCall(pModule->getFunction("add1"), Ten);
 	pCallInst->setTailCall(true);
 
 	// Create the return instruction and add it to the basic block.
@@ -102,15 +99,15 @@ int main()
 	llvm::outs().flush();
 
 	// Now we create the JIT.
-	llvm::ExecutionEngine* EE = llvm::EngineBuilder(std::move(pModule)).create();
+	llvm::ExecutionEngine *pExecutionEngine = llvm::EngineBuilder(std::move(pModule)).create();
 
 	// Call the `foo' function with no arguments:
 	std::vector<llvm::GenericValue> noargs;
-	llvm::GenericValue gv = EE->runFunction(FooF, noargs);
+	llvm::GenericValue gv = pExecutionEngine->runFunction(FooF, noargs);
 
 	// Import result of execution:
 	llvm::outs() << "Result: " << gv.IntVal << "\n";
-	delete EE;
+	delete pExecutionEngine;
 	llvm::llvm_shutdown();
 	return 0;
 }
