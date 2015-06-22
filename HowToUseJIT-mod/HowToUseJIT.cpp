@@ -51,23 +51,23 @@ int main()
 {
 	llvm::InitializeNativeTarget();
 
-	llvm::LLVMContext Context;
+	llvm::LLVMContext context;
   
 	// Create some module to put our function into it.
-	std::unique_ptr<llvm::Module> pModule = llvm::make_unique<llvm::Module>("test", Context);
+	std::unique_ptr<llvm::Module> pModule = llvm::make_unique<llvm::Module>("test", context);
 
 	// Create the add1 function entry and insert this entry into module M.  The
 	// function will have a return type of "int" and take an argument of "int".
 	// The '0' terminates the list of argument types.
 	llvm::Function *pFunction = llvm::cast<llvm::Function>(pModule->getOrInsertFunction(
 									   "add1",
-									   llvm::Type::getInt32Ty(Context),
-									   llvm::Type::getInt32Ty(Context),
+									   llvm::Type::getInt32Ty(context),
+									   llvm::Type::getInt32Ty(context),
 									   (llvm::Type *)0));
 
 	// Add a basic block to the function. As before, it automatically inserts
 	// because of the last argument.
-	llvm::BasicBlock *pBasicBlock = llvm::BasicBlock::Create(Context, "EntryBlock", pFunction);
+	llvm::BasicBlock *pBasicBlock = llvm::BasicBlock::Create(context, "EntryBlock", pFunction);
 
 	// Create a basic block builder with default parameters.  The builder will
 	// automatically append instructions to the basic block `pBasicBlock'.
@@ -93,11 +93,11 @@ int main()
 	// Now we're going to create function `foo', which returns an int and takes no
 	// arguments.
 	llvm::Function *FooF =
-		llvm::cast<llvm::Function>(pModule->getOrInsertFunction("foo", llvm::Type::getInt32Ty(Context),
+		llvm::cast<llvm::Function>(pModule->getOrInsertFunction("foo", llvm::Type::getInt32Ty(context),
 													(llvm::Type *)0));
 
 	// Add a basic block to the FooF function.
-	pBasicBlock = llvm::BasicBlock::Create(Context, "EntryBlock", FooF);
+	pBasicBlock = llvm::BasicBlock::Create(context, "EntryBlock", FooF);
 
 	// Tell the basic block builder to attach itself to the new basic block
 	builder.SetInsertPoint(pBasicBlock);
