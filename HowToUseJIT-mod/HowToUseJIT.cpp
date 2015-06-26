@@ -54,15 +54,16 @@ int main()
 	std::unique_ptr<llvm::Module> pModule = llvm::make_unique<llvm::Module>("test", context);
 	llvm::IRBuilder<> builder(context);
 	do {
-#if 0
-		std::vector<llvm::Type *> argTypes;
-		argTypes.push_back(builder.getInt32Ty());
-		llvm::ArrayRef<llvm::Type *> argTypesRef(argTypes);
+		// declare i32 @puts(i8*)
 		llvm::Function *pFunction = llvm::cast<llvm::Function>(
 			pModule->getOrInsertFunction(
-				"add1",
-				llvm::FunctionType::get(builder.getInt32Ty(), argTypesRef, false)));
-#endif
+				"puts",
+				builder.getInt32Ty(),
+				builder.getInt8Ty()->getPointerTo(),
+				nullptr));
+	} while (0);
+	do {
+		// define i32 @add1(i32)
 		llvm::Function *pFunction = llvm::cast<llvm::Function>(
 			pModule->getOrInsertFunction(
 				"add1",
@@ -79,15 +80,32 @@ int main()
 		builder.CreateRet(pValue);
 	} while (0);
 	do {
+		// define i32 @foo()
 		llvm::Function *pFunction = llvm::cast<llvm::Function>(
 			pModule->getOrInsertFunction(
 				"foo",
-				llvm::FunctionType::get(builder.getInt32Ty(), false)));
+				builder.getInt32Ty(),
+				nullptr));
 		llvm::BasicBlock *pBasicBlock = llvm::BasicBlock::Create(context, "entrypoint", pFunction);
 		builder.SetInsertPoint(pBasicBlock);
 		llvm::CallInst *pCallInst = builder.CreateCall(
 			pModule->getFunction("add1"),
 			builder.getInt32(10));
+		pCallInst->setTailCall(true);
+		builder.CreateRet(pCallInst);
+	} while (0);
+	do {
+		// define i32 @bar()
+		llvm::Function *pFunction = llvm::cast<llvm::Function>(
+			pModule->getOrInsertFunction(
+				"bar",
+				builder.getInt32Ty(),
+				nullptr));
+		llvm::BasicBlock *pBasicBlock = llvm::BasicBlock::Create(context, "entrypoint", pFunction);
+		builder.SetInsertPoint(pBasicBlock);
+		llvm::CallInst *pCallInst = builder.CreateCall(
+			pModule->getFunction("puts"),
+			builder.CreateGlobalStringPtr("hello world!"));
 		pCallInst->setTailCall(true);
 		builder.CreateRet(pCallInst);
 	} while (0);
@@ -97,10 +115,21 @@ int main()
 	do {
 		std::unique_ptr<llvm::ExecutionEngine> pExecutionEngine(
 			llvm::EngineBuilder(std::move(pModule)).create());
-		std::vector<llvm::GenericValue> args;
-		llvm::GenericValue genericValue = pExecutionEngine->runFunction(
-			pExecutionEngine->FindFunctionNamed("foo"), args);
-		llvm::outs() << "Result: " << genericValue.IntVal << "\n";
+		//pExecutionEngine->addLibrary("c");
+		pExecutionEngine->addGlobalMapping(
+			pExecutionEngine->FindFunctionNamed("puts"), reinterpret_cast<void *>(&::puts));
+		do {
+			std::vector<llvm::GenericValue> args;
+			llvm::GenericValue genericValue = pExecutionEngine->runFunction(
+				pExecutionEngine->FindFunctionNamed("bar"), args);
+			//llvm::outs() << "Result: " << genericValue.IntVal << "\n";
+		} while (0);
+		//do {
+		//	typedef int (*Func)();
+		//	Func func = reinterpret_cast<Func>(pExecutionEngine->getPointerToFunction(
+		//										   pExecutionEngine->FindFunctionNamed("foo")));
+		//	llvm::outs() << "Result: " << func() << "\n";
+		//} while (0);
 	} while (0);
 	llvm::llvm_shutdown();
 	return 0;
