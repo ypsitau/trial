@@ -1,0 +1,12 @@
+#!/bin/sh
+
+llvm-gcc -x c -o sample.ll -S -emit-llvm $* - <<EOF
+#include <stdio.h>
+
+void func(const char *str);
+
+void foo()
+{
+	func("string in sub.ll");
+}
+EOF

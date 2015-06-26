@@ -1,8 +1,8 @@
 main: main.o sub.o
-	gcc -o $@ $+
+	g++ -o $@ $+
 
-main.o: main.c
-	gcc -c $<
+main.o: main.cpp
+	g++ -c $<
 
 sub.o: sub.ll
-	llc -filetype=obj sub.ll
+	~/tools/clang/bin/llc -filetype=obj sub.ll
