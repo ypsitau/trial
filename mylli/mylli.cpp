@@ -56,6 +56,61 @@ int main(int argc, char *argv[])
 				  llvm::cl::init("main"));
 	llvm::Function *pFunction = pModule->getFunction(EntryFunc);
 	llvm::EngineBuilder builder(std::move(pModule));
+
+	llvm::cl::opt<std::string> MArch("march",
+									 llvm::cl::desc("Architecture to generate assembly for (see --version)"));
+	
+	llvm::cl::opt<std::string>
+		MCPU("mcpu",
+			 llvm::cl::desc("Target a specific cpu type (-mcpu=help for details)"),
+			 llvm::cl::value_desc("cpu-name"),
+			 llvm::cl::init(""));
+	
+	llvm::cl::list<std::string>
+		MAttrs("mattr",
+			   llvm::cl::CommaSeparated,
+			   llvm::cl::desc("Target specific attributes (-mattr=help for details)"),
+			   llvm::cl::value_desc("a1,+a2,-a3,..."));
+	
+	llvm::cl::opt<llvm::Reloc::Model>
+		RelocModel("relocation-model",
+				   llvm::cl::desc("Choose relocation model"),
+				   llvm::cl::init(llvm::Reloc::Default),
+				   llvm::cl::values(
+					   clEnumValN(llvm::Reloc::Default, "default",
+								  "Target default relocation model"),
+					   clEnumValN(llvm::Reloc::Static, "static",
+								  "Non-relocatable code"),
+					   clEnumValN(llvm::Reloc::PIC_, "pic",
+								  "Fully relocatable, position independent code"),
+					   clEnumValN(llvm::Reloc::DynamicNoPIC, "dynamic-no-pic",
+								  "Relocatable external references, non-relocatable code"),
+					   clEnumValEnd));
+	
+	llvm::cl::opt<llvm::CodeModel::Model>
+		CMModel("code-model",
+				llvm::cl::desc("Choose code model"),
+				llvm::cl::init(llvm::CodeModel::JITDefault),
+				llvm::cl::values(clEnumValN(llvm::CodeModel::JITDefault, "default",
+											"Target default JIT code model"),
+								 clEnumValN(llvm::CodeModel::Small, "small",
+											"Small code model"),
+								 clEnumValN(llvm::CodeModel::Kernel, "kernel",
+											"Kernel code model"),
+								 clEnumValN(llvm::CodeModel::Medium, "medium",
+											"Medium code model"),
+								 clEnumValN(llvm::CodeModel::Large, "large",
+											"Large code model"),
+								 clEnumValEnd));
+	
+	builder.setMArch(MArch);
+	builder.setMCPU(MCPU);
+	builder.setMAttrs(MAttrs);
+	builder.setRelocationModel(RelocModel);
+	builder.setCodeModel(CMModel);
+	builder.setEngineKind(llvm::EngineKind::Interpreter); // EngineKind::JIT
+
+
 	std::string errorStr;
 	builder.setErrorStr(&errorStr);
 	std::unique_ptr<llvm::ExecutionEngine> pExecutionEngine(builder.create());
@@ -67,7 +122,13 @@ int main(int argc, char *argv[])
 		exit(1);
 	}
 	std::vector<std::string> argvSub;
+
 	pExecutionEngine->DisableLazyCompilation(true);
+	pExecutionEngine->RegisterJITEventListener(
+		llvm::JITEventListener::createOProfileJITEventListener());
+	pExecutionEngine->RegisterJITEventListener(
+		llvm::JITEventListener::createIntelJITEventListener());
+
     int result = pExecutionEngine->runFunctionAsMain(pFunction, argvSub, nullptr);
 	return 0;
 }
