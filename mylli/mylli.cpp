@@ -67,6 +67,7 @@ int main(int argc, char *argv[])
 		exit(1);
 	}
 	std::vector<std::string> argvSub;
+	pExecutionEngine->DisableLazyCompilation(true);
     int result = pExecutionEngine->runFunctionAsMain(pFunction, argvSub, nullptr);
 	return 0;
 }
