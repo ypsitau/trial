@@ -55,43 +55,30 @@
 int main(int argc, char **argv, char * const *envp)
 {
 	llvm::LLVMContext &context = llvm::getGlobalContext();
+	llvm::SMDiagnostic err;
+	std::unique_ptr<llvm::Module> pModule(llvm::parseIRFile(argv[1], err, context));
+	if (pModule == nullptr) {
+		::fprintf(stderr, "error while createing module");
+		::exit(1);
+	}
 	llvm::InitializeNativeTarget();
 	llvm::InitializeNativeTargetAsmPrinter();
 	llvm::InitializeNativeTargetAsmParser();
-	llvm::SMDiagnostic Err;
-	std::unique_ptr<llvm::Module> pModule(llvm::parseIRFile(argv[1], Err, context));
-	if (pModule == nullptr) {
-		Err.print(argv[0], llvm::errs());
-		return 1;
-	}
-	llvm::IRBuilder<> builder(context);
-    pModule->getOrInsertFunction("exit",
-								 builder.getVoidTy(),
-								 builder.getInt32Ty(),
-								 nullptr);
 	llvm::EngineBuilder engineBuilder(std::move(pModule));
-	std::string ErrorMsg;
 	llvm::ExecutionEngine *pExecutionEngine = engineBuilder.create();
-	if (!pExecutionEngine) {
-		if (ErrorMsg.empty()) {
-			llvm::errs() << argv[0] << ": unknown error creating EE!\n";
-		} else {
-			llvm::errs() << argv[0] << ": error creating EE: " << ErrorMsg << "\n";
-		}
-		exit(1);
+	if (pExecutionEngine == nullptr) {
+		::fprintf(stderr, "error while building execution engine");
+		::exit(1);
 	}
-	llvm::Function *EntryFn = pExecutionEngine->FindFunctionNamed("main");
-	if (!EntryFn) {
-		llvm::errs() << '\'' << "main" << "\' function not found in module.\n";
-		return -1;
-	}
-	errno = 0;
 	pExecutionEngine->finalizeObject();
-
     pExecutionEngine->runStaticConstructorsDestructors(false);
-    (void)pExecutionEngine->getPointerToFunction(EntryFn);
+	llvm::Function *pFunction = pExecutionEngine->FindFunctionNamed("main");
+	if (pFunction == nullptr) {
+		::fprintf(stderr, "failed to find function main");
+		::exit(1);
+	}
 	std::vector<std::string> argvSub;
-    int Result = pExecutionEngine->runFunctionAsMain(EntryFn, argvSub, envp);
+    int Result = pExecutionEngine->runFunctionAsMain(pFunction, argvSub, envp);
     pExecutionEngine->runStaticConstructorsDestructors(true);
 	return Result;
 }
