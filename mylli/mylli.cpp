@@ -52,38 +52,35 @@
 #include "llvm/Transforms/Instrumentation.h"
 #include <cerrno>
 
-using namespace llvm;
-
-#define DEBUG_TYPE "lli"
-
 int main(int argc, char **argv, char * const *envp)
 {
-	LLVMContext &Context = getGlobalContext();
-	InitializeNativeTarget();
-	InitializeNativeTargetAsmPrinter();
-	InitializeNativeTargetAsmParser();
-	SMDiagnostic Err;
-	std::unique_ptr<Module> pModule(parseIRFile(argv[1], Err, Context));
+	llvm::LLVMContext &Context = llvm::getGlobalContext();
+	llvm::InitializeNativeTarget();
+	llvm::InitializeNativeTargetAsmPrinter();
+	llvm::InitializeNativeTargetAsmParser();
+	llvm::SMDiagnostic Err;
+	std::unique_ptr<llvm::Module> pModule(llvm::parseIRFile(argv[1], Err, Context));
 	if (pModule == nullptr) {
-		Err.print(argv[0], errs());
+		Err.print(argv[0], llvm::errs());
 		return 1;
 	}
-    pModule->getOrInsertFunction("exit", Type::getVoidTy(Context),
-							   Type::getInt32Ty(Context),
+    pModule->getOrInsertFunction("exit", llvm::Type::getVoidTy(Context),
+							   llvm::Type::getInt32Ty(Context),
 							   NULL);
-	EngineBuilder builder(std::move(pModule));
+	llvm::EngineBuilder builder(std::move(pModule));
 	std::string ErrorMsg;
-	ExecutionEngine *pExecutionEngine = builder.create();
+	llvm::ExecutionEngine *pExecutionEngine = builder.create();
 	if (!pExecutionEngine) {
-		if (!ErrorMsg.empty())
-			errs() << argv[0] << ": error creating EE: " << ErrorMsg << "\n";
-		else
-			errs() << argv[0] << ": unknown error creating EE!\n";
+		if (ErrorMsg.empty()) {
+			llvm::errs() << argv[0] << ": unknown error creating EE!\n";
+		} else {
+			llvm::errs() << argv[0] << ": error creating EE: " << ErrorMsg << "\n";
+		}
 		exit(1);
 	}
-	Function *EntryFn = pExecutionEngine->FindFunctionNamed("main");
+	llvm::Function *EntryFn = pExecutionEngine->FindFunctionNamed("main");
 	if (!EntryFn) {
-		errs() << '\'' << "main" << "\' function not found in module.\n";
+		llvm::errs() << '\'' << "main" << "\' function not found in module.\n";
 		return -1;
 	}
 	errno = 0;
