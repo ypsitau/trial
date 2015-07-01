@@ -52,13 +52,6 @@
 #include "llvm/Transforms/Instrumentation.h"
 #include <cerrno>
 
-#ifdef __CYGWIN__
-#include <cygwin/version.h>
-#if defined(CYGWIN_VERSION_DLL_MAJOR) && CYGWIN_VERSION_DLL_MAJOR<1007
-#define DO_NOTHING_ATEXIT 1
-#endif
-#endif
-
 using namespace llvm;
 
 #define DEBUG_TYPE "lli"
@@ -69,15 +62,15 @@ int main(int argc, char **argv, char * const *envp)
 	InitializeNativeTarget();
 	InitializeNativeTargetAsmPrinter();
 	InitializeNativeTargetAsmParser();
-	//cl::ParseCommandLineOptions(argc, argv,
-	//							"llvm interpreter & dynamic compiler\n");
 	SMDiagnostic Err;
 	std::unique_ptr<Module> Owner = parseIRFile(argv[1], Err, Context);
-	Module *Mod = Owner.get();
-	if (!Mod) {
+	if (Owner == nullptr) {
 		Err.print(argv[0], errs());
 		return 1;
 	}
+    Owner->getOrInsertFunction("exit", Type::getVoidTy(Context),
+							   Type::getInt32Ty(Context),
+							   NULL);
 	EngineBuilder builder(std::move(Owner));
 	std::string ErrorMsg;
 	ExecutionEngine *EE = builder.create();
@@ -88,22 +81,18 @@ int main(int argc, char **argv, char * const *envp)
 			errs() << argv[0] << ": unknown error creating EE!\n";
 		exit(1);
 	}
-	Function *EntryFn = Mod->getFunction("main");
+	Function *EntryFn = EE->FindFunctionNamed("main");
 	if (!EntryFn) {
 		errs() << '\'' << "main" << "\' function not found in module.\n";
 		return -1;
 	}
 	errno = 0;
-	int Result;
-    Constant *Exit = Mod->getOrInsertFunction("exit", Type::getVoidTy(Context),
-											  Type::getInt32Ty(Context),
-											  NULL);
 	EE->finalizeObject();
 
     EE->runStaticConstructorsDestructors(false);
     (void)EE->getPointerToFunction(EntryFn);
 	std::vector<std::string> argvSub;
-    Result = EE->runFunctionAsMain(EntryFn, argvSub, envp);
+    int Result = EE->runFunctionAsMain(EntryFn, argvSub, envp);
     EE->runStaticConstructorsDestructors(true);
 	return Result;
 }
