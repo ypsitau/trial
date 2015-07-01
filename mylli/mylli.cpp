@@ -78,7 +78,7 @@ int main(int argc, char **argv, char * const *envp)
 		::exit(1);
 	}
 	std::vector<std::string> argvSub;
-    int Result = pExecutionEngine->runFunctionAsMain(pFunction, argvSub, envp);
+    int result = pExecutionEngine->runFunctionAsMain(pFunction, argvSub, envp);
     pExecutionEngine->runStaticConstructorsDestructors(true);
-	return Result;
+	return result;
 }
