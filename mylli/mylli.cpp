@@ -54,22 +54,24 @@
 
 int main(int argc, char **argv, char * const *envp)
 {
-	llvm::LLVMContext &Context = llvm::getGlobalContext();
+	llvm::LLVMContext &context = llvm::getGlobalContext();
 	llvm::InitializeNativeTarget();
 	llvm::InitializeNativeTargetAsmPrinter();
 	llvm::InitializeNativeTargetAsmParser();
 	llvm::SMDiagnostic Err;
-	std::unique_ptr<llvm::Module> pModule(llvm::parseIRFile(argv[1], Err, Context));
+	std::unique_ptr<llvm::Module> pModule(llvm::parseIRFile(argv[1], Err, context));
 	if (pModule == nullptr) {
 		Err.print(argv[0], llvm::errs());
 		return 1;
 	}
-    pModule->getOrInsertFunction("exit", llvm::Type::getVoidTy(Context),
-							   llvm::Type::getInt32Ty(Context),
-							   NULL);
-	llvm::EngineBuilder builder(std::move(pModule));
+	llvm::IRBuilder<> builder(context);
+    pModule->getOrInsertFunction("exit",
+								 builder.getVoidTy(),
+								 builder.getInt32Ty(),
+								 nullptr);
+	llvm::EngineBuilder engineBuilder(std::move(pModule));
 	std::string ErrorMsg;
-	llvm::ExecutionEngine *pExecutionEngine = builder.create();
+	llvm::ExecutionEngine *pExecutionEngine = engineBuilder.create();
 	if (!pExecutionEngine) {
 		if (ErrorMsg.empty()) {
 			llvm::errs() << argv[0] << ": unknown error creating EE!\n";
