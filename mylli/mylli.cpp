@@ -363,26 +363,29 @@ static void addCygMingExtraModule(ExecutionEngine *EE,
 //===----------------------------------------------------------------------===//
 // main Driver function
 //
-int main(int argc, char **argv, char * const *envp) {
+int main(int argc, char **argv, char * const *envp)
+{
+#if 0
   sys::PrintStackTraceOnErrorSignal();
   PrettyStackTraceProgram X(argc, argv);
-
+#endif
   LLVMContext &Context = getGlobalContext();
+#if 0
   atexit(do_shutdown);  // Call llvm_shutdown() on exit.
-
+#endif
   // If we have a native target, initialize it to ensure it is linked in and
   // usable by the JIT.
   InitializeNativeTarget();
   InitializeNativeTargetAsmPrinter();
   InitializeNativeTargetAsmParser();
-
   cl::ParseCommandLineOptions(argc, argv,
                               "llvm interpreter & dynamic compiler\n");
 
   // If the user doesn't want core files, disable them.
+#if 0
   if (DisableCoreFiles)
     sys::Process::PreventCoreFiles();
-
+#endif
   // Load the bitcode...
   SMDiagnostic Err;
   std::unique_ptr<Module> Owner = parseIRFile(InputFile, Err, Context);
@@ -391,14 +394,15 @@ int main(int argc, char **argv, char * const *envp) {
     Err.print(argv[0], errs());
     return 1;
   }
-
+#if 0
   if (EnableCacheManager) {
     std::string CacheName("file:");
     CacheName.append(InputFile);
     Mod->setModuleIdentifier(CacheName);
   }
-
+#endif
   // If not jitting lazily, load the whole bitcode file eagerly too.
+#if 0
   if (NoLazyCompilation) {
     if (std::error_code EC = Mod->materializeAllPermanently()) {
       errs() << argv[0] << ": bitcode didn't read correctly.\n";
@@ -406,9 +410,10 @@ int main(int argc, char **argv, char * const *envp) {
       exit(1);
     }
   }
-
-  std::string ErrorMsg;
+#endif
   EngineBuilder builder(std::move(Owner));
+  std::string ErrorMsg;
+#if 0
   builder.setMArch(MArch);
   builder.setMCPU(MCPU);
   builder.setMAttrs(MAttrs);
@@ -418,11 +423,14 @@ int main(int argc, char **argv, char * const *envp) {
   builder.setEngineKind(ForceInterpreter
                         ? EngineKind::Interpreter
                         : EngineKind::JIT);
-
+#endif
+  
   // If we are supposed to override the target triple, do so now.
+#if 0
   if (!TargetTriple.empty())
     Mod->setTargetTriple(Triple::normalize(TargetTriple));
-
+#endif
+#if 0
   // Enable MCJIT if desired.
   RTDyldMemoryManager *RTDyldMM = nullptr;
   CodeGenOpt::Level OLvl = CodeGenOpt::Default;
@@ -437,7 +445,9 @@ int main(int argc, char **argv, char * const *envp) {
   case '3': OLvl = CodeGenOpt::Aggressive; break;
   }
   builder.setOptLevel(OLvl);
-
+#endif
+  
+#if 0
   TargetOptions Options;
   Options.UseSoftFloat = GenerateSoftFloatCalls;
   if (FloatABIForCalls != FloatABI::Default)
@@ -450,7 +460,8 @@ int main(int argc, char **argv, char * const *envp) {
     Options.JITEmitDebugInfoToDisk = EmitJitDebugInfoToDisk;
 
   builder.setTargetOptions(Options);
-
+#endif
+  
   EE = builder.create();
   if (!EE) {
     if (!ErrorMsg.empty())
@@ -459,12 +470,13 @@ int main(int argc, char **argv, char * const *envp) {
       errs() << argv[0] << ": unknown error creating EE!\n";
     exit(1);
   }
-
+#if 0
   if (EnableCacheManager) {
     CacheManager = new LLIObjectCache(ObjectCacheDir);
     EE->setObjectCache(CacheManager);
   }
-
+#endif
+#if 0
   // Load any additional modules specified on the command line.
   for (unsigned i = 0, e = ExtraModules.size(); i != e; ++i) {
     std::unique_ptr<Module> XMod = parseIRFile(ExtraModules[i], Err, Context);
@@ -499,7 +511,7 @@ int main(int argc, char **argv, char * const *envp) {
       return 1;
     }
     std::unique_ptr<MemoryBuffer> &ArBuf = ArBufOrErr.get();
-
+	
     ErrorOr<std::unique_ptr<object::Archive>> ArOrErr =
         object::Archive::create(ArBuf->getMemBufferRef());
     if (std::error_code EC = ArOrErr.getError()) {
@@ -512,7 +524,9 @@ int main(int argc, char **argv, char * const *envp) {
 
     EE->addArchive(std::move(OB));
   }
+#endif
 
+#if 0
   // If the target is Cygwin/MingW and we are generating remote code, we
   // need an extra module to help out with linking.
 
@@ -524,7 +538,9 @@ int main(int argc, char **argv, char * const *envp) {
                 JITEventListener::createIntelJITEventListener());
 
   EE->DisableLazyCompilation(NoLazyCompilation);
-
+#endif
+  
+#if 0
   // If the user specifically requested an argv[0] to pass into the program,
   // do it now.
   if (!FakeArgv0.empty()) {
@@ -538,7 +554,8 @@ int main(int argc, char **argv, char * const *envp) {
 
   // Add the module's name to the start of the vector of arguments to main().
   InputArgv.insert(InputArgv.begin(), InputFile);
-
+#endif
+  
   // Call the main function from M as if its signature were:
   //   int main (int argc, char **argv, const char **envp)
   // using the contents of Args to determine argc & argv, and the contents of
@@ -572,9 +589,10 @@ int main(int argc, char **argv, char * const *envp) {
     // invalidated will be known.
     (void)EE->getPointerToFunction(EntryFn);
     // Clear instruction cache before code will be executed.
+#if 0
     if (RTDyldMM)
       static_cast<SectionMemoryManager*>(RTDyldMM)->invalidateInstructionCache();
-
+#endif
     // Run main.
     Result = EE->runFunctionAsMain(EntryFn, InputArgv, envp);
 
