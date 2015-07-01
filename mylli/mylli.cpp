@@ -77,9 +77,6 @@ namespace {
   // The MCJIT supports building for a target address space separate from
   // the JIT compilation process. Use a forked process and a copying
   // memory manager with IPC to execute using this functionality.
-  cl::opt<bool> RemoteMCJIT("remote-mcjit",
-    cl::desc("Execute MCJIT'ed code in a separate process."),
-    cl::init(false));
 
   // Manually specify the child process for remote execution. This overrides
   // the simulated remote execution that allocates address space for child
@@ -428,23 +425,6 @@ int main(int argc, char **argv, char * const *envp) {
 
   // Enable MCJIT if desired.
   RTDyldMemoryManager *RTDyldMM = nullptr;
-#if 0
-  if (!ForceInterpreter) {
-    if (RemoteMCJIT)
-      RTDyldMM = new RemoteMemoryManager();
-    else
-      RTDyldMM = new SectionMemoryManager();
-
-    // Deliberately construct a temp std::unique_ptr to pass in. Do not null out
-    // RTDyldMM: We still use it below, even though we don't own it.
-    builder.setMCJITMemoryManager(
-      std::unique_ptr<RTDyldMemoryManager>(RTDyldMM));
-  } else if (RemoteMCJIT) {
-    errs() << "error: Remote process execution does not work with the "
-              "interpreter.\n";
-    exit(1);
-  }
-#endif
   CodeGenOpt::Level OLvl = CodeGenOpt::Default;
   switch (OptLevel) {
   default:
@@ -466,10 +446,8 @@ int main(int argc, char **argv, char * const *envp) {
     FloatABIForCalls = FloatABI::Soft;
 
   // Remote target execution doesn't handle EH or debug registration.
-  if (!RemoteMCJIT) {
     Options.JITEmitDebugInfo = EmitJitDebugInfo;
     Options.JITEmitDebugInfoToDisk = EmitJitDebugInfoToDisk;
-  }
 
   builder.setTargetOptions(Options);
 
@@ -537,9 +515,6 @@ int main(int argc, char **argv, char * const *envp) {
 
   // If the target is Cygwin/MingW and we are generating remote code, we
   // need an extra module to help out with linking.
-  if (RemoteMCJIT && Triple(Mod->getTargetTriple()).isOSCygMing()) {
-    addCygMingExtraModule(EE, Context, Mod->getTargetTriple());
-  }
 
   // The following functions have no effect if their respective profiling
   // support wasn't enabled in the build configuration.
@@ -548,10 +523,6 @@ int main(int argc, char **argv, char * const *envp) {
   EE->RegisterJITEventListener(
                 JITEventListener::createIntelJITEventListener());
 
-  if (!NoLazyCompilation && RemoteMCJIT) {
-    errs() << "warning: remote mcjit does not support lazy compilation\n";
-    NoLazyCompilation = true;
-  }
   EE->DisableLazyCompilation(NoLazyCompilation);
 
   // If the user specifically requested an argv[0] to pass into the program,
@@ -584,7 +555,6 @@ int main(int argc, char **argv, char * const *envp) {
 
   int Result;
 
-  if (!RemoteMCJIT) {
     // If the program doesn't explicitly call exit, we will need the Exit
     // function later on to make an explicit call, so get the function now.
     Constant *Exit = Mod->getOrInsertFunction("exit", Type::getVoidTy(Context),
@@ -625,74 +595,6 @@ int main(int argc, char **argv, char * const *envp) {
       errs() << "ERROR: exit defined with wrong prototype!\n";
       abort();
     }
-  } else {
-#if 0
-    // else == "if (RemoteMCJIT)"
-
-    // Remote target MCJIT doesn't (yet) support static constructors. No reason
-    // it couldn't. This is a limitation of the LLI implemantation, not the
-    // MCJIT itself. FIXME.
-    //
-    //RemoteMemoryManager *MM = static_cast<RemoteMemoryManager*>(RTDyldMM);
-    // Everything is prepared now, so lay out our program for the target
-    // address space, assign the section addresses to resolve any relocations,
-    // and send it to the target.
-
-    std::unique_ptr<RemoteTarget> Target;
-    if (!ChildExecPath.empty()) { // Remote execution on a child process
-#ifndef LLVM_ON_UNIX
-      // FIXME: Remove this pointless fallback mode which causes tests to "pass"
-      // on platforms where they should XFAIL.
-      errs() << "Warning: host does not support external remote targets.\n"
-             << "  Defaulting to simulated remote execution\n";
-      Target.reset(new RemoteTarget);
-#else
-      if (!sys::fs::can_execute(ChildExecPath)) {
-        errs() << "Unable to find usable child executable: '" << ChildExecPath
-               << "'\n";
-        return -1;
-      }
-      Target.reset(new RemoteTargetExternal(ChildExecPath));
-#endif
-    } else {
-      // No child process name provided, use simulated remote execution.
-      Target.reset(new RemoteTarget);
-    }
-
-    // Give the memory manager a pointer to our remote target interface object.
-    //MM->setRemoteTarget(Target.get());
-
-    // Create the remote target.
-    if (!Target->create()) {
-      errs() << "ERROR: " << Target->getErrorMsg() << "\n";
-      return EXIT_FAILURE;
-    }
-
-    // Since we're executing in a (at least simulated) remote address space,
-    // we can't use the ExecutionEngine::runFunctionAsMain(). We have to
-    // grab the function address directly here and tell the remote target
-    // to execute the function.
-    //
-    // Our memory manager will map generated code into the remote address
-    // space as it is loaded and copy the bits over during the finalizeMemory
-    // operation.
-    //
-    // FIXME: argv and envp handling.
-    uint64_t Entry = EE->getFunctionAddress(EntryFn->getName().str());
-
-    DEBUG(dbgs() << "Executing '" << EntryFn->getName() << "' at 0x"
-                 << format("%llx", Entry) << "\n");
-
-    if (!Target->executeCode(Entry, Result))
-      errs() << "ERROR: " << Target->getErrorMsg() << "\n";
-
-    // Like static constructors, the remote target MCJIT support doesn't handle
-    // this yet. It could. FIXME.
-
-    // Stop the remote target
-    Target->stop();
-#endif
-  }
 
   return Result;
 }
