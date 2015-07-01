@@ -63,36 +63,36 @@ int main(int argc, char **argv, char * const *envp)
 	InitializeNativeTargetAsmPrinter();
 	InitializeNativeTargetAsmParser();
 	SMDiagnostic Err;
-	std::unique_ptr<Module> Owner = parseIRFile(argv[1], Err, Context);
-	if (Owner == nullptr) {
+	std::unique_ptr<Module> pModule(parseIRFile(argv[1], Err, Context));
+	if (pModule == nullptr) {
 		Err.print(argv[0], errs());
 		return 1;
 	}
-    Owner->getOrInsertFunction("exit", Type::getVoidTy(Context),
+    pModule->getOrInsertFunction("exit", Type::getVoidTy(Context),
 							   Type::getInt32Ty(Context),
 							   NULL);
-	EngineBuilder builder(std::move(Owner));
+	EngineBuilder builder(std::move(pModule));
 	std::string ErrorMsg;
-	ExecutionEngine *EE = builder.create();
-	if (!EE) {
+	ExecutionEngine *pExecutionEngine = builder.create();
+	if (!pExecutionEngine) {
 		if (!ErrorMsg.empty())
 			errs() << argv[0] << ": error creating EE: " << ErrorMsg << "\n";
 		else
 			errs() << argv[0] << ": unknown error creating EE!\n";
 		exit(1);
 	}
-	Function *EntryFn = EE->FindFunctionNamed("main");
+	Function *EntryFn = pExecutionEngine->FindFunctionNamed("main");
 	if (!EntryFn) {
 		errs() << '\'' << "main" << "\' function not found in module.\n";
 		return -1;
 	}
 	errno = 0;
-	EE->finalizeObject();
+	pExecutionEngine->finalizeObject();
 
-    EE->runStaticConstructorsDestructors(false);
-    (void)EE->getPointerToFunction(EntryFn);
+    pExecutionEngine->runStaticConstructorsDestructors(false);
+    (void)pExecutionEngine->getPointerToFunction(EntryFn);
 	std::vector<std::string> argvSub;
-    int Result = EE->runFunctionAsMain(EntryFn, argvSub, envp);
-    EE->runStaticConstructorsDestructors(true);
+    int Result = pExecutionEngine->runFunctionAsMain(EntryFn, argvSub, envp);
+    pExecutionEngine->runStaticConstructorsDestructors(true);
 	return Result;
 }
