@@ -365,6 +365,94 @@ static void addCygMingExtraModule(ExecutionEngine *EE,
 //
 int main(int argc, char **argv, char * const *envp)
 {
+  LLVMContext &Context = getGlobalContext();
+  // If we have a native target, initialize it to ensure it is linked in and
+  // usable by the JIT.
+  InitializeNativeTarget();
+  InitializeNativeTargetAsmPrinter();
+  InitializeNativeTargetAsmParser();
+  cl::ParseCommandLineOptions(argc, argv,
+                              "llvm interpreter & dynamic compiler\n");
+
+  // If the user doesn't want core files, disable them.
+  // Load the bitcode...
+  SMDiagnostic Err;
+  std::unique_ptr<Module> Owner = parseIRFile(InputFile, Err, Context);
+  Module *Mod = Owner.get();
+  if (!Mod) {
+    Err.print(argv[0], errs());
+    return 1;
+  }
+  EngineBuilder builder(std::move(Owner));
+  std::string ErrorMsg;
+  EE = builder.create();
+  if (!EE) {
+    if (!ErrorMsg.empty())
+      errs() << argv[0] << ": error creating EE: " << ErrorMsg << "\n";
+    else
+      errs() << argv[0] << ": unknown error creating EE!\n";
+    exit(1);
+  }
+  // Call the main function from M as if its signature were:
+  //   int main (int argc, char **argv, const char **envp)
+  // using the contents of Args to determine argc & argv, and the contents of
+  // EnvVars to determine envp.
+  //
+  Function *EntryFn = Mod->getFunction(EntryFunc);
+  if (!EntryFn) {
+    errs() << '\'' << EntryFunc << "\' function not found in module.\n";
+    return -1;
+  }
+
+  // Reset errno to zero on entry to main.
+  errno = 0;
+
+  int Result;
+
+    // If the program doesn't explicitly call exit, we will need the Exit
+    // function later on to make an explicit call, so get the function now.
+    Constant *Exit = Mod->getOrInsertFunction("exit", Type::getVoidTy(Context),
+                                                      Type::getInt32Ty(Context),
+                                                      NULL);
+
+    // Run static constructors.
+    if (!ForceInterpreter) {
+      // Give MCJIT a chance to apply relocations and set page permissions.
+      EE->finalizeObject();
+    }
+    EE->runStaticConstructorsDestructors(false);
+
+    // Trigger compilation separately so code regions that need to be
+    // invalidated will be known.
+    (void)EE->getPointerToFunction(EntryFn);
+    // Clear instruction cache before code will be executed.
+    // Run main.
+    Result = EE->runFunctionAsMain(EntryFn, InputArgv, envp);
+
+    // Run static destructors.
+    EE->runStaticConstructorsDestructors(true);
+
+    // If the program didn't call exit explicitly, we should call it now.
+    // This ensures that any atexit handlers get called correctly.
+    if (Function *ExitF = dyn_cast<Function>(Exit)) {
+      std::vector<GenericValue> Args;
+      GenericValue ResultGV;
+      ResultGV.IntVal = APInt(32, Result);
+      Args.push_back(ResultGV);
+      EE->runFunction(ExitF, Args);
+      errs() << "ERROR: exit(" << Result << ") returned!\n";
+      abort();
+    } else {
+      errs() << "ERROR: exit defined with wrong prototype!\n";
+      abort();
+    }
+
+  return Result;
+}
+
+#if 0
+int main(int argc, char **argv, char * const *envp)
+{
 #if 0
   sys::PrintStackTraceOnErrorSignal();
   PrettyStackTraceProgram X(argc, argv);
@@ -616,3 +704,4 @@ int main(int argc, char **argv, char * const *envp)
 
   return Result;
 }
+#endif
