@@ -40,23 +40,42 @@ int main(int argc, char **argv, char * const *envp)
 	llvm::SMDiagnostic err;
 	std::unique_ptr<llvm::Module> pModule(llvm::parseIRFile(argv[1], err, context));
 	if (pModule == nullptr) {
-		::fprintf(stderr, "error while createing module");
+		::fprintf(stderr, "error while createing module\n");
 		::exit(1);
 	}
 	llvm::InitializeNativeTarget();
 	llvm::InitializeNativeTargetAsmPrinter();
 	llvm::InitializeNativeTargetAsmParser();
 	llvm::EngineBuilder engineBuilder(std::move(pModule));
+	std::string errStr;
+	engineBuilder.setMArch("");
+	engineBuilder.setMCPU("");
+	std::vector<std::string> attrs;
+	engineBuilder.setMAttrs(attrs);
+	engineBuilder.setRelocationModel(llvm::Reloc::Default);
+	engineBuilder.setCodeModel(llvm::CodeModel::JITDefault);
+	engineBuilder.setErrorStr(&errStr);
+	//engineBuilder.setEngineKind(llvm::EngineKind::Interpreter);
+	engineBuilder.setEngineKind(llvm::EngineKind::JIT);
 	llvm::ExecutionEngine *pExecutionEngine = engineBuilder.create();
 	if (pExecutionEngine == nullptr) {
-		::fprintf(stderr, "error while building execution engine");
+		::fprintf(stderr, "error while building execution engine\n");
 		::exit(1);
 	}
+	do {
+		llvm::ErrorOr<llvm::object::OwningBinary<llvm::object::ObjectFile>>
+			pObjectFile(llvm::object::ObjectFile::createObjectFile("sub.o"));
+		if (pObjectFile.getError()) {
+			::fprintf(stderr, "failed to load object file\n");
+			::exit(1);
+		}
+		pExecutionEngine->addObjectFile(std::move(pObjectFile.get()));
+	} while (0);
 	pExecutionEngine->finalizeObject();
     pExecutionEngine->runStaticConstructorsDestructors(false);
 	llvm::Function *pFunction = pExecutionEngine->FindFunctionNamed("main");
 	if (pFunction == nullptr) {
-		::fprintf(stderr, "failed to find function main");
+		::fprintf(stderr, "failed to find function main\n");
 		::exit(1);
 	}
 	std::vector<std::string> argvSub;
