@@ -365,59 +365,47 @@ static void addCygMingExtraModule(ExecutionEngine *EE,
 //
 int main(int argc, char **argv, char * const *envp)
 {
-  LLVMContext &Context = getGlobalContext();
-  InitializeNativeTarget();
-  InitializeNativeTargetAsmPrinter();
-  InitializeNativeTargetAsmParser();
-  cl::ParseCommandLineOptions(argc, argv,
-                              "llvm interpreter & dynamic compiler\n");
-  SMDiagnostic Err;
-  std::unique_ptr<Module> Owner = parseIRFile(InputFile, Err, Context);
-  Module *Mod = Owner.get();
-  if (!Mod) {
-    Err.print(argv[0], errs());
-    return 1;
-  }
-  EngineBuilder builder(std::move(Owner));
-  std::string ErrorMsg;
-  EE = builder.create();
-  if (!EE) {
-    if (!ErrorMsg.empty())
-      errs() << argv[0] << ": error creating EE: " << ErrorMsg << "\n";
-    else
-      errs() << argv[0] << ": unknown error creating EE!\n";
-    exit(1);
-  }
-  Function *EntryFn = Mod->getFunction(EntryFunc);
-  if (!EntryFn) {
-    errs() << '\'' << EntryFunc << "\' function not found in module.\n";
-    return -1;
-  }
-  errno = 0;
-  int Result;
+	LLVMContext &Context = getGlobalContext();
+	InitializeNativeTarget();
+	InitializeNativeTargetAsmPrinter();
+	InitializeNativeTargetAsmParser();
+	cl::ParseCommandLineOptions(argc, argv,
+								"llvm interpreter & dynamic compiler\n");
+	SMDiagnostic Err;
+	std::unique_ptr<Module> Owner = parseIRFile(InputFile, Err, Context);
+	Module *Mod = Owner.get();
+	if (!Mod) {
+		Err.print(argv[0], errs());
+		return 1;
+	}
+	EngineBuilder builder(std::move(Owner));
+	std::string ErrorMsg;
+	EE = builder.create();
+	if (!EE) {
+		if (!ErrorMsg.empty())
+			errs() << argv[0] << ": error creating EE: " << ErrorMsg << "\n";
+		else
+			errs() << argv[0] << ": unknown error creating EE!\n";
+		exit(1);
+	}
+	Function *EntryFn = Mod->getFunction(EntryFunc);
+	if (!EntryFn) {
+		errs() << '\'' << EntryFunc << "\' function not found in module.\n";
+		return -1;
+	}
+	errno = 0;
+	int Result;
     Constant *Exit = Mod->getOrInsertFunction("exit", Type::getVoidTy(Context),
-                                                      Type::getInt32Ty(Context),
-                                                      NULL);
+											  Type::getInt32Ty(Context),
+											  NULL);
     if (!ForceInterpreter) {
-      EE->finalizeObject();
+		EE->finalizeObject();
     }
     EE->runStaticConstructorsDestructors(false);
     (void)EE->getPointerToFunction(EntryFn);
     Result = EE->runFunctionAsMain(EntryFn, InputArgv, envp);
     EE->runStaticConstructorsDestructors(true);
-    if (Function *ExitF = dyn_cast<Function>(Exit)) {
-      std::vector<GenericValue> Args;
-      GenericValue ResultGV;
-      ResultGV.IntVal = APInt(32, Result);
-      Args.push_back(ResultGV);
-      EE->runFunction(ExitF, Args);
-      errs() << "ERROR: exit(" << Result << ") returned!\n";
-      abort();
-    } else {
-      errs() << "ERROR: exit defined with wrong prototype!\n";
-      abort();
-    }
-  return Result;
+	return Result;
 }
 
 #if 0
