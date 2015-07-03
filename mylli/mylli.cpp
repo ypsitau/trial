@@ -62,6 +62,7 @@ int main(int argc, char **argv, char * const *envp)
 		::fprintf(stderr, "error while building execution engine\n");
 		::exit(1);
 	}
+#if 0
 	do {
 		llvm::ErrorOr<llvm::object::OwningBinary<llvm::object::ObjectFile>>
 			pObjectFile(llvm::object::ObjectFile::createObjectFile("sub.o"));
@@ -71,15 +72,33 @@ int main(int argc, char **argv, char * const *envp)
 		}
 		pExecutionEngine->addObjectFile(std::move(pObjectFile.get()));
 	} while (0);
+#endif
 	pExecutionEngine->finalizeObject();
     pExecutionEngine->runStaticConstructorsDestructors(false);
+	int result = 0;
 	llvm::Function *pFunction = pExecutionEngine->FindFunctionNamed("main");
 	if (pFunction == nullptr) {
 		::fprintf(stderr, "failed to find function main\n");
 		::exit(1);
 	}
-	std::vector<std::string> argvSub;
-    int result = pExecutionEngine->runFunctionAsMain(pFunction, argvSub, envp);
+#if 0
+	do {
+		// ExecutionEngine::runFunctionAsMain() executes getPointerToFunction internally.
+		std::vector<std::string> argvSub;
+		result = pExecutionEngine->runFunctionAsMain(pFunction, argvSub, envp);
+	} while (0);
+#else
+	do {
+		int (*func)() = reinterpret_cast<int (*)()>(pExecutionEngine->getPointerToFunction(pFunction));
+		result = func();
+	} while (0);
+#endif
     pExecutionEngine->runStaticConstructorsDestructors(true);
 	return result;
+}
+
+extern "C" int func_mylli()
+{
+	::printf("message from mylli\n");
+	return 0;
 }
