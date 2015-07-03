@@ -36,9 +36,9 @@
 
 int main(int argc, char **argv, char * const *envp)
 {
-	llvm::LLVMContext &context = llvm::getGlobalContext();
 	llvm::SMDiagnostic err;
-	std::unique_ptr<llvm::Module> pModule(llvm::parseIRFile(argv[1], err, context));
+	std::unique_ptr<llvm::Module>
+		pModule(llvm::parseIRFile(argv[1], err, llvm::getGlobalContext()));
 	if (pModule == nullptr) {
 		::fprintf(stderr, "error while createing module\n");
 		::exit(1);
