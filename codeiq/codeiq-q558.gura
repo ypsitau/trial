@@ -1,7 +1,9 @@
 #!/usr/bin/env gura
 
+n = 10
+colWidth = 6
 a = []
-repeat(10) {
+repeat(n) {
 	a = [1, a + a.offset(1), 1]
-	println(a.join(' '))
+	println((a:*tostring():*align(colWidth):center).join().align(colWidth * (n + 1)):center)
 }

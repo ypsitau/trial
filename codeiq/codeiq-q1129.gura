@@ -4,7 +4,6 @@
 fibTable = [0, 1]
 idxHead = 0
 MakeFibTable() = {
-	extern(fibTable, idxHead)
 	[n, m] = [0, 1]
 	repeat {
 		nPrev = n
@@ -14,7 +13,7 @@ MakeFibTable() = {
 		if ((idx = fibTable.find(n):index) && \
 					(idx + 1 < fibTable.len()) && fibTable[idx + 1] == m) {
 			fibTable.erase(fibTable.len() - 1)
-			idxHead = idx
+			idxHead:extern = idx
 			break
 		}
 		fibTable.add(m)

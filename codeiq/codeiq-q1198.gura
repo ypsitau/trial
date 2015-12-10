@@ -1,8 +1,15 @@
 #!/usr/bin/env gura
 // Answer to the question: https://codeiq.jp/ace/joboffer_apli/q1198
 
-countBitOne(x:number):map = (format('%b', x).split() == '1').count()
-
+//countBitOne(x:number):map = (format('%b', x).split() == '1').count()
+countBitOne(x:number):map = {
+	cnt = 0
+	while (x != 0) {
+		if ((x & 1) != 0) { cnt += 1 }
+		x >>= 1
+	}
+	cnt
+}
 num = 0..99
 bcd = int(num / 10) * 16 + num % 10
 matched = (countBitOne(num) == countBitOne(bcd))
