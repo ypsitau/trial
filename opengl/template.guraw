@@ -1,0 +1,30 @@
+#!/usr/bin/env gura
+import(opengl) {*}
+import(glut) {*}
+
+display() = {
+	glClear(GL_COLOR_BUFFER_BIT)
+	glFlush()
+}
+
+keyboard(code:number, x:number, y:number) = {
+	if (code == 27) {
+		sys.exit(0)
+	}
+}
+
+init() = {
+	glClearColor(1.0, 1.0, 1.0, 1.0)
+}
+
+main() = {
+	glutInit(sys.argv)
+	glutInitDisplayMode(GLUT_RGB)
+	glutCreateWindow(sys.argv[0])
+	glutDisplayFunc(display)
+	glutKeyboardFunc(keyboard);
+	init()
+	glutMainLoop()
+}
+
+main()
