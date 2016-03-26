@@ -12,34 +12,44 @@ App = class(wx.App) {
 
 PanelMain = class(wx.Panel) {
 	TimerId = 1
+	YYYY = '2015'
+	YY = '15'
+	MM = '03'
+	DD = '21'
+	hh = '13'
+	mm = '24'
+	ss = '47'
+	SEQ = 'AA'
 	__init__(parent:wx.Windowm) = {|parent|
 		outerBox = wx.BoxSizer(wx.VERTICAL)
 		this.SetSizer(outerBox)
 		vbox = wx.BoxSizer(wx.VERTICAL)
 		outerBox.Add(vbox, wx.SizerFlags(1).Expand().Border(wx.ALL, 2))
-		wx.TextCtrl(this, wx.ID_ANY) {|ctrl|
+		wx.StaticText(this, wx.ID_ANY,
+					  format('%s-%s-%s %s:%s:%s', YYYY, MM, DD, hh, mm, ss)) {|ctrl|
 			vbox.Add(ctrl, wx.SizerFlags().Expand())
+		}
+		str = '${YYYY}/${YYYY}${MM}${DD}/${YYYY}_${MM}${DD}_${hh}${mm}${ss}${SEQ}'
+		wx.TextCtrl(this, wx.ID_ANY, str) {|ctrl|
+			vbox.Add(ctrl, wx.SizerFlags().Expand().Border(wx.TOP, 4))
 			ctrl.Bind(wx.EVT_TEXT) {|event| this.OnText(event)}
 			this.textEnter = ctrl
 		}
 		wx.TextCtrl(this, wx.ID_ANY, style => wx.TE_MULTILINE) {|ctrl|
-			vbox.Add(ctrl, wx.SizerFlags(1).Expand())
+			vbox.Add(ctrl, wx.SizerFlags(1).Expand().Border(wx.TOP, 4))
 			this.textLog = ctrl
 		}
-		this.timer = wx.Timer(this, this.TimerId)
+		this.timer = wx.Timer(this, TimerId)
 		this.Bind(wx.EVT_TIMER, this.TimerId) {|event| this.OnTimer(event)}
+		this.UpdateSample()
 	}
 	OnText(event:wx.CommandEvent) = {
 		this.timer.Start(500, true)
 	}
 	OnTimer(event:wx.TimerEvent) = {
-		YYYY = '2015'
-		YY = '15'
-		MM = '03'
-		DD = '21'
-		hh = '13'
-		mm = '24'
-		ss = '47'
+		this.UpdateSample()
+	}
+	UpdateSample() = {
 		strTmpl = this.textEnter.GetValue()
 		try {
 			this.textLog.SetValue(strTmpl.embed())
