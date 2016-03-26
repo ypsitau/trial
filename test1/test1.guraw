@@ -1,0 +1,35 @@
+#!/usr/bin/env gura
+import(wx)
+import(resource)
+
+App = class(wx.App) {
+	OnInit() = {
+		frame = FrameMain('Simple')
+		frame.Show()
+		true
+	}
+}
+
+PanelMain = class(wx.Panel) {
+	__init__(parent:wx.Windowm) = {|parent|
+		outerBox = wx.BoxSizer(wx.VERTICAL)
+		this.SetSizer(outerBox)
+		vbox = wx.BoxSizer(wx.VERTICAL)
+		outerBox.Add(vbox, wx.SizerFlags(1).Expand().Border(wx.ALL, 2))
+		wx.TextCtrl(this, wx.ID_ANY) {|ctrl|
+			vbox.Add(ctrl, wx.SizerFlags().Expand())
+		}
+	}
+}
+
+FrameMain = class(wx.Frame) {
+	__init__(title:string, pos:wx.Point => wx.DefaultPosition,
+			size:wx.Size => wx.DefaultSize) = {|nil, wx.ID_ANY, title, pos, size|
+		this.SetIcon(wx.IconFromXPMData(resource.sample_xpm))
+		menuBar = wx.MenuBar()
+		PanelMain(this)
+		this.SetMenuBar(menuBar)
+	}
+}
+
+wx.IMPLEMENT_APP(App)
