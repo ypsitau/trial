@@ -11,6 +11,7 @@ App = class(wx.App) {
 }
 
 PanelMain = class(wx.Panel) {
+	TimerId = 1
 	__init__(parent:wx.Windowm) = {|parent|
 		outerBox = wx.BoxSizer(wx.VERTICAL)
 		this.SetSizer(outerBox)
@@ -18,6 +19,32 @@ PanelMain = class(wx.Panel) {
 		outerBox.Add(vbox, wx.SizerFlags(1).Expand().Border(wx.ALL, 2))
 		wx.TextCtrl(this, wx.ID_ANY) {|ctrl|
 			vbox.Add(ctrl, wx.SizerFlags().Expand())
+			ctrl.Bind(wx.EVT_TEXT) {|event| this.OnText(event)}
+			this.textEnter = ctrl
+		}
+		wx.TextCtrl(this, wx.ID_ANY, style => wx.TE_MULTILINE) {|ctrl|
+			vbox.Add(ctrl, wx.SizerFlags(1).Expand())
+			this.textLog = ctrl
+		}
+		this.timer = wx.Timer(this, this.TimerId)
+		this.Bind(wx.EVT_TIMER, this.TimerId) {|event| this.OnTimer(event)}
+	}
+	OnText(event:wx.CommandEvent) = {
+		this.timer.Start(500, true)
+	}
+	OnTimer(event:wx.TimerEvent) = {
+		YYYY = '2015'
+		YY = '15'
+		MM = '03'
+		DD = '21'
+		hh = '13'
+		mm = '24'
+		ss = '47'
+		strTmpl = this.textEnter.GetValue()
+		try {
+			this.textLog.SetValue(strTmpl.embed())
+		} catch {|e|
+			this.textLog.SetValue(e.text)
 		}
 	}
 }
