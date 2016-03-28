@@ -4,7 +4,7 @@ import(resource)
 
 App = class(wx.App) {
 	OnInit() = {
-		frame = PatternEditorFrame()
+		frame = MainFrame()
 		frame.Show()
 		true
 	}
@@ -32,7 +32,7 @@ PatternEditorPanel = class(wx.Panel) {
 			this.textEnter = ctrl
 		}
 		wx.StaticText(this, wx.ID_ANY,
-					  format('Sample: ' + '%s-%s-%s %s:%s:%s', YYYY, MM, DD, hh, mm, ss)) {|ctrl|
+					  format('Sample: '$ + '%s-%s-%s %s:%s:%s', YYYY, MM, DD, hh, mm, ss)) {|ctrl|
 			vbox.Add(ctrl, wx.SizerFlags().Expand().Border(wx.TOP, 4))
 		}
 		wx.TextCtrl(this, wx.ID_ANY) {|ctrl|
@@ -64,12 +64,96 @@ PatternEditorPanel = class(wx.Panel) {
 
 PatternEditorFrame = class(wx.Frame) {
 	__init__(pos:wx.Point => wx.DefaultPosition) = \
-					{|nil, wx.ID_ANY, 'Pattern Editor', pos, wx.Size(800, 300)|
+					{|nil, wx.ID_ANY, 'Pattern Editor'$, pos, wx.Size(800, 300)|
 		this.SetIcon(wx.IconFromXPMData(resource.sample_xpm))
 		menuBar = wx.MenuBar()
 		PatternEditorPanel(this)
 		this.SetMenuBar(menuBar)
 	}
 }
+
+ImageViewer = class(wx.Panel) {
+	__init__(parent:wx.Windowm, style:number) = {|parent, style => style|
+		this.Bind(wx.EVT_ERASE_BACKGROUND) { /* nothing to do */ }
+		this.Bind(wx.EVT_SIZE) {|event| this.OnSize(event)}
+		this.Bind(wx.EVT_PAINT) {|event| this.OnPaint(event)}
+		this.Bind(wx.EVT_SCROLLWIN) {|event| this.OnScrollWin(event)}
+		this.Bind(wx.EVT_MOUSEWHEEL) {|event| this.OnMouseWheel(event)}
+	}
+	OnSize(event:wx.SizeEvent) = {
+	}
+	OnPaint(event:wx.PaintEvent) = {
+		dc = wx.PaintDC(this)
+		dc.DrawRectangle(10 + 110 * (0..6), 10, 100, 100)
+		dc = nil
+	}
+	OnScrollWin(event:wx.ScrollWinEvent) = {
+	}
+	OnMouseWheel(event:wx.MouseEvent) = {
+	}
+}
+
+MainPanel = class(wx.Panel) {
+	__init__(parent:wx.Windowm) = {|parent|
+		outerBox = wx.BoxSizer(wx.VERTICAL)
+		this.SetSizer(outerBox)
+		vbox = wx.BoxSizer(wx.VERTICAL)
+		outerBox.Add(vbox, wx.SizerFlags(1).Expand().Border(wx.ALL, 2))
+		wx.FlexGridSizer(nil, 3, 4, 4) {|gbox|
+			gbox.AddGrowableCol(1, 1)
+			vbox.Add(gbox, wx.SizerFlags().Expand())
+			wx.StaticText(this, wx.ID_ANY, 'Source'$) {|ctrl|
+				gbox.Add(ctrl, wx.SizerFlags())
+			}
+			wx.TextCtrl(this, wx.ID_ANY) {|ctrl|
+				gbox.Add(ctrl, wx.SizerFlags().Expand())
+			}
+			wx.Button(this, wx.ID_ANY, 'Browse'$) {|ctrl|
+				gbox.Add(ctrl, wx.SizerFlags())
+			}
+			wx.StaticText(this, wx.ID_ANY, 'Destination'$) {|ctrl|
+				gbox.Add(ctrl, wx.SizerFlags())
+			}
+			wx.TextCtrl(this, wx.ID_ANY) {|ctrl|
+				gbox.Add(ctrl, wx.SizerFlags().Expand())
+			}
+			wx.Button(this, wx.ID_ANY, 'Browse'$) {|ctrl|
+				gbox.Add(ctrl, wx.SizerFlags())
+			}
+			wx.StaticText(this, wx.ID_ANY, 'Rename Rule'$) {|ctrl|
+				gbox.Add(ctrl, wx.SizerFlags())
+			}
+			wx.StaticText(this, wx.ID_ANY, '', style => wx.SUNKEN_BORDER) {|ctrl|
+				gbox.Add(ctrl, wx.SizerFlags().Expand())
+			}
+			wx.Button(this, wx.ID_ANY, 'Edit'$) {|ctrl|
+				gbox.Add(ctrl, wx.SizerFlags())
+			}
+		}
+		wx.BoxSizer(wx.HORIZONTAL) {|hbox|
+			vbox.Add(hbox, wx.SizerFlags().Expand().Border(wx.TOP, 4))
+			wx.Button(this, wx.ID_ANY, 'Run'$) {|ctrl|
+				hbox.Add(ctrl, wx.SizerFlags())
+			}
+			wx.Gauge(this, wx.ID_ANY, 100, style => wx.GA_HORIZONTAL) {|ctrl|
+				hbox.Add(ctrl, wx.SizerFlags(1).Expand().Border(wx.LEFT, 4))
+			}
+		}
+		ImageViewer(this, style => wx.SUNKEN_BORDER) {|ctrl|
+			vbox.Add(ctrl, wx.SizerFlags(1).Expand().Border(wx.TOP, 4))
+		}
+	}
+}
+
+MainFrame = class(wx.Frame) {
+	__init__(pos:wx.Point => wx.DefaultPosition) = \
+					{|nil, wx.ID_ANY, 'Getter Photo', pos, wx.Size(800, 600)|
+		this.SetIcon(wx.IconFromXPMData(resource.sample_xpm))
+		menuBar = wx.MenuBar()
+		MainPanel(this)
+		this.SetMenuBar(menuBar)
+	}
+}
+
 
 wx.IMPLEMENT_APP(App)
