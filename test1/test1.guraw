@@ -1,5 +1,6 @@
 #!/usr/bin/env gura
 import(wx)
+import(jpeg)
 import(resource)
 
 App = class(wx.App) {
@@ -74,22 +75,76 @@ PatternEditorFrame = class(wx.Frame) {
 
 ImageViewer = class(wx.Panel) {
 	__init__(parent:wx.Windowm, style:number) = {|parent, style => style|
+		this.bmpScreen = nil
+		this.brushBg = wx.Brush(wx.WHITE, wx.BRUSHSTYLE_SOLID)
 		this.Bind(wx.EVT_ERASE_BACKGROUND) { /* nothing to do */ }
 		this.Bind(wx.EVT_SIZE) {|event| this.OnSize(event)}
 		this.Bind(wx.EVT_PAINT) {|event| this.OnPaint(event)}
 		this.Bind(wx.EVT_SCROLLWIN) {|event| this.OnScrollWin(event)}
 		this.Bind(wx.EVT_MOUSEWHEEL) {|event| this.OnMouseWheel(event)}
 	}
+	UpdateContent() = {
+		pathNames = path.walk('/Users/ypsitau/Pictures/2000/20000916 Family', -1, '*.JPG')
+		println(pathNames)
+		[wdClient, htClient] = this.GetClientSizeWH()
+		this.bmpScreen = wx.BitmapWH(wdClient, htClient)
+		wx.MemoryDC(this.bmpScreen) {|dc|
+			dc.SetBackground(this.brushBg)
+			dc.Clear()
+			x = 0, y = 0
+			pathNames.each {|pathName|
+				dc.DrawBitmap(image(pathName).thumbnail(100):box, x, y, false)
+				x += 110
+			}
+		}
+	}
 	OnSize(event:wx.SizeEvent) = {
+		this.UpdateContent()
+		event.Skip()
 	}
 	OnPaint(event:wx.PaintEvent) = {
 		dc = wx.PaintDC(this)
-		dc.DrawRectangle(10 + 110 * (0..6), 10, 100, 100)
+		if (this.bmpScreen) {
+			x = this.GetScrollPos(wx.HORIZONTAL)
+			y = this.GetScrollPos(wx.VERTICAL)
+			dc.DrawBitmap(this.bmpScreen, -x, -y, false)
+		}
 		dc = nil
 	}
 	OnScrollWin(event:wx.ScrollWinEvent) = {
+		eventType = event.GetEventType()
+		orientation = event.GetOrientation()
+		if (eventType == wx.EVT_SCROLLWIN_TOP.GetEventType()) {
+			pos = 0
+		} elsif (eventType == wx.EVT_SCROLLWIN_BOTTOM.GetEventType()) {
+			pos = this.GetScrollRange(orientation)
+		} elsif (eventType == wx.EVT_SCROLLWIN_LINEUP.GetEventType()) {
+			pos = this.GetScrollPos(orientation) - 10
+		} elsif (eventType == wx.EVT_SCROLLWIN_LINEDOWN.GetEventType()) {
+			pos = this.GetScrollPos(orientation) + 10
+		} elsif (eventType == wx.EVT_SCROLLWIN_PAGEUP.GetEventType()) {
+			pos = this.GetScrollPos(orientation) - 100
+		} elsif (eventType == wx.EVT_SCROLLWIN_PAGEDOWN.GetEventType()) {
+			pos = this.GetScrollPos(orientation) + 100
+		} elsif (eventType == wx.EVT_SCROLLWIN_THUMBTRACK.GetEventType()) {
+			pos = event.GetPosition()
+		} elsif (eventType == wx.EVT_SCROLLWIN_THUMBRELEASE.GetEventType()) {
+			pos = event.GetPosition()
+		}
+		this.SetScrollPos(orientation, pos)
+		this.Refresh()
 	}
 	OnMouseWheel(event:wx.MouseEvent) = {
+		orientation = wx.VERTICAL
+		rot = event.GetWheelRotation()
+		pos = this.GetScrollPos(orientation)
+		if (rot < 0) {
+			this.SetScrollPos(orientation, pos + 10)
+			this.Refresh()
+		} elsif (rot > 0) {
+			this.SetScrollPos(orientation, pos - 10)
+			this.Refresh()
+		}
 	}
 }
 
@@ -120,7 +175,7 @@ MainPanel = class(wx.Panel) {
 			wx.Button(this, wx.ID_ANY, 'Browse'$) {|ctrl|
 				gbox.Add(ctrl, wx.SizerFlags())
 			}
-			wx.StaticText(this, wx.ID_ANY, 'Rename Rule'$) {|ctrl|
+			wx.StaticText(this, wx.ID_ANY, 'Pattern'$) {|ctrl|
 				gbox.Add(ctrl, wx.SizerFlags())
 			}
 			wx.StaticText(this, wx.ID_ANY, '', style => wx.SUNKEN_BORDER) {|ctrl|
