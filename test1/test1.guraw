@@ -74,28 +74,60 @@ PatternEditorFrame = class(wx.Frame) {
 }
 
 ImageViewer = class(wx.Panel) {
-	__init__(parent:wx.Windowm, style:number) = {|parent, style => style|
+	__init__(parent:wx.Windowm, style:number) = \
+						{|parent, style => (style | wx.HSCROLL | wx.VSCROLL)|
 		this.bmpScreen = nil
 		this.brushBg = wx.Brush(wx.WHITE, wx.BRUSHSTYLE_SOLID)
+		this.rectsExpand = []
 		this.Bind(wx.EVT_ERASE_BACKGROUND) { /* nothing to do */ }
 		this.Bind(wx.EVT_SIZE) {|event| this.OnSize(event)}
 		this.Bind(wx.EVT_PAINT) {|event| this.OnPaint(event)}
 		this.Bind(wx.EVT_SCROLLWIN) {|event| this.OnScrollWin(event)}
 		this.Bind(wx.EVT_MOUSEWHEEL) {|event| this.OnMouseWheel(event)}
+		this.Bind(wx.EVT_LEFT_DOWN) {|event| this.OnLeftDown(event)}
+		this.Bind(wx.EVT_LEFT_UP) {|event| this.OnLeftUp(event)}
+		this.Bind(wx.EVT_MOTION) {|event| this.OnMotion(event)}
 	}
 	UpdateContent() = {
-		pathNames = path.walk('/Users/ypsitau/Pictures/2000/20000916 Family', -1, '*.JPG')
-		println(pathNames)
+		dirNameTop = '/Users/ypsitau/Pictures'
+		htLine = 20
+		dirNames = (path.walk(dirNameTop, 1, '*'):dir).sort():list
 		[wdClient, htClient] = this.GetClientSizeWH()
-		this.bmpScreen = wx.BitmapWH(wdClient, htClient)
+		htRequired = dirNames.len() * htLine
+		htScreen = max(htClient, htRequired)
+		this.bmpScreen = wx.BitmapWH(wdClient, htScreen)
 		wx.MemoryDC(this.bmpScreen) {|dc|
 			dc.SetBackground(this.brushBg)
 			dc.Clear()
-			x = 0, y = 0
-			pathNames.each {|pathName|
-				dc.DrawBitmap(image(pathName).thumbnail(100):box, x, y, false)
-				x += 110
+			y = 0
+			dirNames.each {|dirName|
+				this.rectsExpand.add(wx.Rect(0, y, 20, 20))
+				dc.DrawText('+', 0, y)
+				dc.DrawText(dirName, 20, y)
+				y += htLine
 			}
+		}
+		y = 0
+		this.SetScrollbar(wx.VERTICAL, y, htClient, htScreen)
+	}
+	SenseBox(pt:wx.Point) = {
+		idx = this.rectsExpand:*Contains(pt).find():index
+		if (idx) {
+			`expandButton
+		} else {
+			`none
+		}
+	}
+	OnLeftDown(event:wx.MouseEvent) = {
+	}
+	OnLeftUp(event:wx.MouseEvent) = {
+	}
+	OnMotion(event:wx.MouseEvent) = {
+		rtn = this.SenseBox(event.GetPosition())
+		if (rtn == `expandButton) {
+			this.SetCursor(wx.StockCursor(wx.CURSOR_HAND))
+		} else {
+			this.SetCursor(wx.StockCursor(wx.CURSOR_ARROW))
 		}
 	}
 	OnSize(event:wx.SizeEvent) = {
