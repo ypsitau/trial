@@ -73,12 +73,14 @@ PatternEditorFrame = class(wx.Frame) {
 	}
 }
 
+ContainerInfo = struct(dirName:string, rc:wx.Rect, expandFlag:boolean, images[]:image => [])
+
 ImageViewer = class(wx.Panel) {
 	__init__(parent:wx.Windowm, style:number) = \
 						{|parent, style => (style | wx.HSCROLL | wx.VSCROLL)|
 		this.bmpScreen = nil
 		this.brushBg = wx.Brush(wx.WHITE, wx.BRUSHSTYLE_SOLID)
-		this.rectsExpand = []
+		this.containerInfos = []
 		this.Bind(wx.EVT_ERASE_BACKGROUND) { /* nothing to do */ }
 		this.Bind(wx.EVT_SIZE) {|event| this.OnSize(event)}
 		this.Bind(wx.EVT_PAINT) {|event| this.OnPaint(event)}
@@ -87,43 +89,66 @@ ImageViewer = class(wx.Panel) {
 		this.Bind(wx.EVT_LEFT_DOWN) {|event| this.OnLeftDown(event)}
 		this.Bind(wx.EVT_LEFT_UP) {|event| this.OnLeftUp(event)}
 		this.Bind(wx.EVT_MOTION) {|event| this.OnMotion(event)}
+		this.UpdateContainerInfos()
+	}
+	UpdateContainerInfos() = {
+		htLine = 20
+		dirNameTop = '/Users/ypsitau/Pictures'
+		dirNames = (path.walk(dirNameTop, 1, '*'):dir).sort():list
+		this.containerInfos = dirNames.each():list {|dirName, idx|
+			y = idx * htLine
+			ContainerInfo(dirName, wx.Rect(0, y, 10, 20), false)
+		}
 	}
 	UpdateContent() = {
-		dirNameTop = '/Users/ypsitau/Pictures'
 		htLine = 20
-		dirNames = (path.walk(dirNameTop, 1, '*'):dir).sort():list
 		[wdClient, htClient] = this.GetClientSizeWH()
-		htRequired = dirNames.len() * htLine
+		htRequired = this.containerInfos.len() * htLine
 		htScreen = max(htClient, htRequired)
 		this.bmpScreen = wx.BitmapWH(wdClient, htScreen)
 		wx.MemoryDC(this.bmpScreen) {|dc|
 			dc.SetBackground(this.brushBg)
 			dc.Clear()
 			y = 0
-			dirNames.each {|dirName|
-				this.rectsExpand.add(wx.Rect(0, y, 20, 20))
-				dc.DrawText('+', 0, y)
-				dc.DrawText(dirName, 20, y)
+			this.containerInfos.each {|containerInfo|
+				dc.DrawText(cond(containerInfo.expandFlag, '-', '+'), 0, y)
+				dc.DrawText(containerInfo.dirName, 20, y)
+				if (containerInfo.expandFlag) {
+					if (containerInfo.images.isempty()) {
+						pathNames = path.dir(containerInfo.dirName, '*.JPG')
+						println(pathNames)
+						containerInfo.images = image(pathNames)::thumbnail(30):box
+					}
+					dc.DrawBitmap(containerInfo.images, (0..) * 30, y, false)
+				}
 				y += htLine
 			}
 		}
 		y = 0
 		this.SetScrollbar(wx.VERTICAL, y, htClient, htScreen)
+		this.Refresh()
+		this.Update()
 	}
-	SenseBox(pt:wx.Point) = {
-		idx = this.rectsExpand:*Contains(pt).find():index
+	SenseBox(pt:wx.Point, clickFlag:boolean) = {
+		idx = this.containerInfos:*rc:*Contains(pt).find():index
 		if (idx) {
+			if (clickFlag) {
+				containerInfo = this.containerInfos[idx]
+				containerInfo.expandFlag = !containerInfo.expandFlag
+			}
 			`expandButton
 		} else {
 			`none
 		}
 	}
 	OnLeftDown(event:wx.MouseEvent) = {
+		rtn = this.SenseBox(event.GetPosition(), true)
+		this.UpdateContent()
 	}
 	OnLeftUp(event:wx.MouseEvent) = {
 	}
 	OnMotion(event:wx.MouseEvent) = {
-		rtn = this.SenseBox(event.GetPosition())
+		rtn = this.SenseBox(event.GetPosition(), false)
 		if (rtn == `expandButton) {
 			this.SetCursor(wx.StockCursor(wx.CURSOR_HAND))
 		} else {
