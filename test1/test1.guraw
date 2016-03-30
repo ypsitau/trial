@@ -108,6 +108,7 @@ ImageViewer = class(wx.Panel) {
 		sizeThumbnail = 150
 		[wdClient, htClient] = this.GetClientSizeWH()
 		y = 0
+		nCols = int((wdClient - wdMgnLeft + wdSkip) / (sizeThumbnail + wdSkip))
 		this.containerInfos.each {|containerInfo|
 			containerInfo.y = y
 			containerInfo.rc.y = y
@@ -118,7 +119,7 @@ ImageViewer = class(wx.Panel) {
 					println(pathNames)
 					containerInfo.images = image(pathNames)::thumbnail(sizeThumbnail):box
 				}
-				nRows = int((containerInfo.images.len() + 5) / 6)
+				nRows = int((containerInfo.images.len() + nCols - 1) / nCols)
 				htImages = nRows * sizeThumbnail
 				if (nRows > 1) { htImages += (nRows - 1) * htSkip }
 				y += htImages
@@ -138,8 +139,8 @@ ImageViewer = class(wx.Panel) {
 				dc.DrawText(cond(containerInfo.expandFlag, '-', '+'), 0, y)
 				dc.DrawText(containerInfo.dirName, 20, y)
 				if (containerInfo.expandFlag) {
-					xsSlot = wdMgnLeft + (range(images.len()) % 6) * (sizeThumbnail + wdSkip)
-					ysSlot = y + htLine + int(range(images.len()) / 6) * (sizeThumbnail + htSkip)
+					xsSlot = wdMgnLeft + (range(images.len()) % nCols) * (sizeThumbnail + wdSkip)
+					ysSlot = y + htLine + int(range(images.len()) / nCols) * (sizeThumbnail + htSkip)
 					xsImage = xsSlot + (sizeThumbnail - images:*width) / 2
 					ysImage = ysSlot + (sizeThumbnail - images:*height) / 2
 					dc.DrawRectangle(xsSlot, ysSlot, sizeThumbnail, sizeThumbnail)
@@ -147,13 +148,13 @@ ImageViewer = class(wx.Panel) {
 				}
 			}
 		}
-		y = 0
-		this.SetScrollbar(wx.VERTICAL, y, htClient, htScreen)
+		this.SetScrollbar(wx.VERTICAL, this.GetScrollPos(wx.VERTICAL), htClient, htScreen)
 		this.Refresh()
 		this.Update()
 	}
-	SenseBox(pt:wx.Point, clickFlag:boolean) = {
-		idx = this.containerInfos:*rc:*Contains(pt).find():index
+	SenseBox(pt:wx.Position, clickFlag:boolean) = {
+		x = pt.x, y = pt.y + this.GetScrollPos(wx.VERTICAL)
+		idx = this.containerInfos:*rc:*ContainsXY(x, y).find():index
 		if (idx) {
 			if (clickFlag) {
 				containerInfo = this.containerInfos[idx]
