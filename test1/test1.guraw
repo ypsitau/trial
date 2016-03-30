@@ -73,13 +73,14 @@ PatternEditorFrame = class(wx.Frame) {
 	}
 }
 
-ImageInfo = struct(image:image):map
+ImageInfo = struct(pathName:string, image:image:nil):map
 
-ContainerInfo = struct(dirName:string, pathNames[]:string,
-					   y:number, rcExpand:wx.Rect, expandFlag:boolean, imageInfos[]:ImageInfo => [])
+ContainerInfo = struct(dirName:string, imageInfos[]:ImageInfo,
+					   y:number, rcExpand:wx.Rect, expandFlag:boolean)
 
 ImageViewer = class(wx.Panel) {
 	TimerId = 1
+	SizeThumbnail = 150
 	__init__(parent:wx.Windowm, style:number) = \
 						{|parent, style => (style | wx.HSCROLL | wx.VSCROLL)|
 		this.bmpScreen = nil
@@ -87,6 +88,7 @@ ImageViewer = class(wx.Panel) {
 		this.brushSlot = wx.Brush(wx.Colour(200, 200, 200), wx.BRUSHSTYLE_SOLID)
 		this.containerInfos = []
 		this.timer = wx.Timer(this, TimerId)
+		this.imageInfoQue = []
 		this.Bind(wx.EVT_ERASE_BACKGROUND) { /* nothing to do */ }
 		this.Bind(wx.EVT_SIZE) {|event| this.OnSize(event)}
 		this.Bind(wx.EVT_TIMER, this.TimerId) {|event| this.OnTimer(event)}
@@ -96,6 +98,7 @@ ImageViewer = class(wx.Panel) {
 		this.Bind(wx.EVT_LEFT_DOWN) {|event| this.OnLeftDown(event)}
 		this.Bind(wx.EVT_LEFT_UP) {|event| this.OnLeftUp(event)}
 		this.Bind(wx.EVT_MOTION) {|event| this.OnMotion(event)}
+		this.Bind(wx.EVT_IDLE) {|event| this.OnIdle(event)}
 		this.UpdateContainerInfos()
 	}
 	UpdateContainerInfos() = {
@@ -104,32 +107,31 @@ ImageViewer = class(wx.Panel) {
 		this.containerInfos = dirNames.each():xlist {|dirName|
 			pathNames = [path.dir(dirName, '*.JPG', '*.jpg', '*.JPEG', '*.jpeg')]
 			pathNames.isempty() && continue
-			ContainerInfo(dirName, pathNames, 0, wx.Rect(0, 0, 10, 20), false)
+			ContainerInfo(dirName, ImageInfo(pathNames, nil), 0, wx.Rect(0, 0, 10, 20), false)
 		}
 	}
 	UpdateContent() = {
 		wdMgnLeft = 20
 		wdSkip = 8, htSkip = 8
 		htLine = 20
-		sizeThumbnail = 150
 		[wdClient, htClient] = this.GetClientSizeWH()
 		y = 0
-		nCols = int((wdClient - wdMgnLeft + wdSkip) / (sizeThumbnail + wdSkip))
+		nCols = int((wdClient - wdMgnLeft + wdSkip) / (SizeThumbnail + wdSkip))
 		this.containerInfos.each {|containerInfo|
 			containerInfo.y = y
 			containerInfo.rcExpand.y = y
 			y += htLine
 			if (containerInfo.expandFlag) {
-				if (containerInfo.imageInfos.isempty()) {
+				containerInfo.imageInfos.each {|imageInfo|
+					imageInfo.image && continue
 					try {
-						containerInfo.imageInfos = \
-							[ImageInfo(image(containerInfo.pathNames):*thumbnail(sizeThumbnail):box)]
+						//imageInfo.image = image(imageInfo.pathName).thumbnail(SizeThumbnail):box
 					} catch {
-						containerInfo.imageInfos = []
+						imageInfo.image = nil
 					}
 				}
 				nRows = int((containerInfo.imageInfos.len() + nCols - 1) / nCols)
-				htImages = nRows * sizeThumbnail
+				htImages = nRows * SizeThumbnail
 				if (nRows > 1) { htImages += (nRows - 1) * htSkip }
 				y += htImages
 			}
@@ -147,14 +149,17 @@ ImageViewer = class(wx.Panel) {
 				imageInfos = containerInfo.imageInfos
 				dc.DrawText(cond(containerInfo.expandFlag, '-', '+'), 0, y)
 				dc.DrawText(format('%s [%d images]', containerInfo.dirName,
-								   containerInfo.pathNames.len()), 20, y)
+								   containerInfo.imageInfos.len()), 20, y)
 				if (containerInfo.expandFlag) {
-					xsSlot = wdMgnLeft + (range(imageInfos.len()) % nCols) * (sizeThumbnail + wdSkip)
-					ysSlot = y + htLine + int(range(imageInfos.len()) / nCols) * (sizeThumbnail + htSkip)
-					xsImage = xsSlot + (sizeThumbnail - imageInfos:*image:*width) / 2
-					ysImage = ysSlot + (sizeThumbnail - imageInfos:*image:*height) / 2
-					dc.DrawRectangle(xsSlot, ysSlot, sizeThumbnail, sizeThumbnail)
-					dc.DrawBitmap(imageInfos:*image, xsImage, ysImage, false)
+					xsSlot = wdMgnLeft + (range(imageInfos.len()) % nCols) * (SizeThumbnail + wdSkip)
+					ysSlot = y + htLine + int(range(imageInfos.len()) / nCols) * (SizeThumbnail + htSkip)
+					dc.DrawRectangle(xsSlot, ysSlot, SizeThumbnail, SizeThumbnail)
+					for (imageInfo in imageInfos, xSlot in xsSlot, ySlot in ysSlot) {
+						!imageInfo.image && continue
+						xImage = xSlot + (SizeThumbnail - imageInfo.image.width) / 2
+						yImage = ySlot + (SizeThumbnail - imageInfo.image.height) / 2
+						dc.DrawBitmap(imageInfo.image, xImage, yImage, false)
+					}
 				}
 			}
 		}
@@ -169,6 +174,9 @@ ImageViewer = class(wx.Panel) {
 			if (clickFlag) {
 				containerInfo = this.containerInfos[idx]
 				containerInfo.expandFlag = !containerInfo.expandFlag
+				if (containerInfo.expandFlag) {
+					this.imageInfoQue.append(containerInfo.imageInfos)
+				}
 			}
 			`expandButton
 		} else {
@@ -239,6 +247,16 @@ ImageViewer = class(wx.Panel) {
 			this.SetScrollPos(orientation, pos - 10)
 			this.Refresh()
 		}
+	}
+	OnIdle(event:wx.IdleEvent) = {
+		this.imageInfoQue.isempty() && return
+		repeat (10) {
+			this.imageInfoQue.isempty() && break
+			imageInfo = this.imageInfoQue[0]
+			this.imageInfoQue.erase(0)
+			imageInfo.image = image(imageInfo.pathName).thumbnail(SizeThumbnail):box
+		}
+		this.UpdateContent()
 	}
 }
 
