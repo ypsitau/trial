@@ -73,13 +73,14 @@ PatternEditorFrame = class(wx.Frame) {
 	}
 }
 
-ContainerInfo = struct(dirName:string, rc:wx.Rect, expandFlag:boolean, images[]:image => [])
+ContainerInfo = struct(dirName:string, y:number, rc:wx.Rect, expandFlag:boolean, images[]:image => [])
 
 ImageViewer = class(wx.Panel) {
 	__init__(parent:wx.Windowm, style:number) = \
 						{|parent, style => (style | wx.HSCROLL | wx.VSCROLL)|
 		this.bmpScreen = nil
 		this.brushBg = wx.Brush(wx.WHITE, wx.BRUSHSTYLE_SOLID)
+		this.brushSlot = wx.Brush(wx.Colour(200, 200, 200), wx.BRUSHSTYLE_SOLID)
 		this.containerInfos = []
 		this.Bind(wx.EVT_ERASE_BACKGROUND) { /* nothing to do */ }
 		this.Bind(wx.EVT_SIZE) {|event| this.OnSize(event)}
@@ -97,31 +98,53 @@ ImageViewer = class(wx.Panel) {
 		dirNames = (path.walk(dirNameTop, 1, '*'):dir).sort():list
 		this.containerInfos = dirNames.each():list {|dirName, idx|
 			y = idx * htLine
-			ContainerInfo(dirName, wx.Rect(0, y, 10, 20), false)
+			ContainerInfo(dirName, y, wx.Rect(0, y, 10, 20), false)
 		}
 	}
 	UpdateContent() = {
+		wdMgnLeft = 20
+		wdSkip = 8, htSkip = 8
 		htLine = 20
+		sizeThumbnail = 150
 		[wdClient, htClient] = this.GetClientSizeWH()
-		htRequired = this.containerInfos.len() * htLine
+		y = 0
+		this.containerInfos.each {|containerInfo|
+			containerInfo.y = y
+			containerInfo.rc.y = y
+			y += htLine
+			if (containerInfo.expandFlag) {
+				if (containerInfo.images.isempty()) {
+					pathNames = path.dir(containerInfo.dirName, '*.JPG')
+					println(pathNames)
+					containerInfo.images = image(pathNames)::thumbnail(sizeThumbnail):box
+				}
+				nRows = int((containerInfo.images.len() + 5) / 6)
+				htImages = nRows * sizeThumbnail
+				if (nRows > 1) { htImages += (nRows - 1) * htSkip }
+				y += htImages
+			}
+		}
+		htRequired = y
 		htScreen = max(htClient, htRequired)
 		this.bmpScreen = wx.BitmapWH(wdClient, htScreen)
 		wx.MemoryDC(this.bmpScreen) {|dc|
 			dc.SetBackground(this.brushBg)
 			dc.Clear()
-			y = 0
+			dc.SetPen(wx.NullPen)
+			dc.SetBrush(this.brushSlot)
 			this.containerInfos.each {|containerInfo|
+				y = containerInfo.y
+				images = containerInfo.images
 				dc.DrawText(cond(containerInfo.expandFlag, '-', '+'), 0, y)
 				dc.DrawText(containerInfo.dirName, 20, y)
 				if (containerInfo.expandFlag) {
-					if (containerInfo.images.isempty()) {
-						pathNames = path.dir(containerInfo.dirName, '*.JPG')
-						println(pathNames)
-						containerInfo.images = image(pathNames)::thumbnail(30):box
-					}
-					dc.DrawBitmap(containerInfo.images, (0..) * 30, y, false)
+					xsSlot = wdMgnLeft + (range(images.len()) % 6) * (sizeThumbnail + wdSkip)
+					ysSlot = y + htLine + int(range(images.len()) / 6) * (sizeThumbnail + htSkip)
+					xsImage = xsSlot + (sizeThumbnail - images:*width) / 2
+					ysImage = ysSlot + (sizeThumbnail - images:*height) / 2
+					dc.DrawRectangle(xsSlot, ysSlot, sizeThumbnail, sizeThumbnail)
+					dc.DrawBitmap(images, xsImage, ysImage, false)
 				}
-				y += htLine
 			}
 		}
 		y = 0
