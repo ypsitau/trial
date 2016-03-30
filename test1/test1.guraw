@@ -73,8 +73,10 @@ PatternEditorFrame = class(wx.Frame) {
 	}
 }
 
+ImageInfo = struct(image:image):map
+
 ContainerInfo = struct(dirName:string, pathNames[]:string,
-					   y:number, rcExpand:wx.Rect, expandFlag:boolean, images[]:image => [])
+					   y:number, rcExpand:wx.Rect, expandFlag:boolean, imageInfos[]:ImageInfo => [])
 
 ImageViewer = class(wx.Panel) {
 	TimerId = 1
@@ -118,15 +120,15 @@ ImageViewer = class(wx.Panel) {
 			containerInfo.rcExpand.y = y
 			y += htLine
 			if (containerInfo.expandFlag) {
-				if (containerInfo.images.isempty()) {
+				if (containerInfo.imageInfos.isempty()) {
 					try {
-						containerInfo.images = \
-							image(containerInfo.pathNames)::thumbnail(sizeThumbnail):box
+						containerInfo.imageInfos = \
+							[ImageInfo(image(containerInfo.pathNames):*thumbnail(sizeThumbnail):box)]
 					} catch {
-						containerInfo.images = []
+						containerInfo.imageInfos = []
 					}
 				}
-				nRows = int((containerInfo.images.len() + nCols - 1) / nCols)
+				nRows = int((containerInfo.imageInfos.len() + nCols - 1) / nCols)
 				htImages = nRows * sizeThumbnail
 				if (nRows > 1) { htImages += (nRows - 1) * htSkip }
 				y += htImages
@@ -142,17 +144,17 @@ ImageViewer = class(wx.Panel) {
 			dc.SetBrush(this.brushSlot)
 			this.containerInfos.each {|containerInfo|
 				y = containerInfo.y
-				images = containerInfo.images
+				imageInfos = containerInfo.imageInfos
 				dc.DrawText(cond(containerInfo.expandFlag, '-', '+'), 0, y)
 				dc.DrawText(format('%s [%d images]', containerInfo.dirName,
 								   containerInfo.pathNames.len()), 20, y)
 				if (containerInfo.expandFlag) {
-					xsSlot = wdMgnLeft + (range(images.len()) % nCols) * (sizeThumbnail + wdSkip)
-					ysSlot = y + htLine + int(range(images.len()) / nCols) * (sizeThumbnail + htSkip)
-					xsImage = xsSlot + (sizeThumbnail - images:*width) / 2
-					ysImage = ysSlot + (sizeThumbnail - images:*height) / 2
+					xsSlot = wdMgnLeft + (range(imageInfos.len()) % nCols) * (sizeThumbnail + wdSkip)
+					ysSlot = y + htLine + int(range(imageInfos.len()) / nCols) * (sizeThumbnail + htSkip)
+					xsImage = xsSlot + (sizeThumbnail - imageInfos:*image:*width) / 2
+					ysImage = ysSlot + (sizeThumbnail - imageInfos:*image:*height) / 2
 					dc.DrawRectangle(xsSlot, ysSlot, sizeThumbnail, sizeThumbnail)
-					dc.DrawBitmap(images, xsImage, ysImage, false)
+					dc.DrawBitmap(imageInfos:*image, xsImage, ysImage, false)
 				}
 			}
 		}
