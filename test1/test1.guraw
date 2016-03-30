@@ -73,17 +73,21 @@ PatternEditorFrame = class(wx.Frame) {
 	}
 }
 
-ContainerInfo = struct(dirName:string, y:number, rc:wx.Rect, expandFlag:boolean, images[]:image => [])
+ContainerInfo = struct(dirName:string, pathNames[]:string,
+					   y:number, rcExpand:wx.Rect, expandFlag:boolean, images[]:image => [])
 
 ImageViewer = class(wx.Panel) {
+	TimerId = 1
 	__init__(parent:wx.Windowm, style:number) = \
 						{|parent, style => (style | wx.HSCROLL | wx.VSCROLL)|
 		this.bmpScreen = nil
 		this.brushBg = wx.Brush(wx.WHITE, wx.BRUSHSTYLE_SOLID)
 		this.brushSlot = wx.Brush(wx.Colour(200, 200, 200), wx.BRUSHSTYLE_SOLID)
 		this.containerInfos = []
+		this.timer = wx.Timer(this, TimerId)
 		this.Bind(wx.EVT_ERASE_BACKGROUND) { /* nothing to do */ }
 		this.Bind(wx.EVT_SIZE) {|event| this.OnSize(event)}
+		this.Bind(wx.EVT_TIMER, this.TimerId) {|event| this.OnTimer(event)}
 		this.Bind(wx.EVT_PAINT) {|event| this.OnPaint(event)}
 		this.Bind(wx.EVT_SCROLLWIN) {|event| this.OnScrollWin(event)}
 		this.Bind(wx.EVT_MOUSEWHEEL) {|event| this.OnMouseWheel(event)}
@@ -93,12 +97,12 @@ ImageViewer = class(wx.Panel) {
 		this.UpdateContainerInfos()
 	}
 	UpdateContainerInfos() = {
-		htLine = 20
 		dirNameTop = '/Users/ypsitau/Pictures'
-		dirNames = (path.walk(dirNameTop, 1, '*'):dir).sort():list
-		this.containerInfos = dirNames.each():list {|dirName, idx|
-			y = idx * htLine
-			ContainerInfo(dirName, y, wx.Rect(0, y, 10, 20), false)
+		dirNames = (path.walk(dirNameTop, 1, '*'):dir).sort(`descend):list
+		this.containerInfos = dirNames.each():xlist {|dirName|
+			pathNames = [path.dir(dirName, '*.JPG', '*.jpg', '*.JPEG', '*.jpeg')]
+			pathNames.isempty() && continue
+			ContainerInfo(dirName, pathNames, 0, wx.Rect(0, 0, 10, 20), false)
 		}
 	}
 	UpdateContent() = {
@@ -111,13 +115,16 @@ ImageViewer = class(wx.Panel) {
 		nCols = int((wdClient - wdMgnLeft + wdSkip) / (sizeThumbnail + wdSkip))
 		this.containerInfos.each {|containerInfo|
 			containerInfo.y = y
-			containerInfo.rc.y = y
+			containerInfo.rcExpand.y = y
 			y += htLine
 			if (containerInfo.expandFlag) {
 				if (containerInfo.images.isempty()) {
-					pathNames = path.dir(containerInfo.dirName, '*.JPG')
-					println(pathNames)
-					containerInfo.images = image(pathNames)::thumbnail(sizeThumbnail):box
+					try {
+						containerInfo.images = \
+							image(containerInfo.pathNames)::thumbnail(sizeThumbnail):box
+					} catch {
+						containerInfo.images = []
+					}
 				}
 				nRows = int((containerInfo.images.len() + nCols - 1) / nCols)
 				htImages = nRows * sizeThumbnail
@@ -137,7 +144,8 @@ ImageViewer = class(wx.Panel) {
 				y = containerInfo.y
 				images = containerInfo.images
 				dc.DrawText(cond(containerInfo.expandFlag, '-', '+'), 0, y)
-				dc.DrawText(containerInfo.dirName, 20, y)
+				dc.DrawText(format('%s [%d images]', containerInfo.dirName,
+								   containerInfo.pathNames.len()), 20, y)
 				if (containerInfo.expandFlag) {
 					xsSlot = wdMgnLeft + (range(images.len()) % nCols) * (sizeThumbnail + wdSkip)
 					ysSlot = y + htLine + int(range(images.len()) / nCols) * (sizeThumbnail + htSkip)
@@ -154,7 +162,7 @@ ImageViewer = class(wx.Panel) {
 	}
 	SenseBox(pt:wx.Position, clickFlag:boolean) = {
 		x = pt.x, y = pt.y + this.GetScrollPos(wx.VERTICAL)
-		idx = this.containerInfos:*rc:*ContainsXY(x, y).find():index
+		idx = this.containerInfos:*rcExpand:*ContainsXY(x, y).find():index
 		if (idx) {
 			if (clickFlag) {
 				containerInfo = this.containerInfos[idx]
@@ -180,8 +188,11 @@ ImageViewer = class(wx.Panel) {
 		}
 	}
 	OnSize(event:wx.SizeEvent) = {
-		this.UpdateContent()
+		this.timer.Start(300, true)
 		event.Skip()
+	}
+	OnTimer(event:wx.TimerEvent) = {
+		this.UpdateContent()
 	}
 	OnPaint(event:wx.PaintEvent) = {
 		dc = wx.PaintDC(this)
