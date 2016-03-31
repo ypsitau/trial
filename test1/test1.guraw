@@ -90,6 +90,7 @@ ImageViewer = class(wx.Panel) {
 	sizeThumbnail = 180
 	wdSkip = 8, htSkip = 8
 	htSeparator = 20
+	htLabel = 16
 	wdMgnLeft = 20, wdMgnRight = 4
 	htMgnTop = 4, htMgnBottom = 8
 	__init__(parent:wx.Windowm, style:number) = \
@@ -102,10 +103,12 @@ ImageViewer = class(wx.Panel) {
 		this.timer = wx.Timer(this, TimerId)
 		this.imageInfoQue = []
 		this.font = wx.Font(11, wx.FONTFAMILY_DEFAULT, wx.FONTSTYLE_NORMAL,
+							wx.FONTWEIGHT_NORMAL)
+		this.fontBold = wx.Font(11, wx.FONTFAMILY_DEFAULT, wx.FONTSTYLE_NORMAL,
 							wx.FONTWEIGHT_BOLD)
-		this.fontUL = wx.Font(11, wx.FONTFAMILY_DEFAULT, wx.FONTSTYLE_NORMAL,
+		this.fontBoldUL = wx.Font(11, wx.FONTFAMILY_DEFAULT, wx.FONTSTYLE_NORMAL,
 							  wx.FONTWEIGHT_NORMAL)
-		this.fontUL.SetUnderlined(true)
+		this.fontBoldUL.SetUnderlined(true)
 		this.Bind(wx.EVT_ERASE_BACKGROUND) { /* nothing to do */ }
 		this.Bind(wx.EVT_SIZE) {|event| this.OnSize(event)}
 		this.Bind(wx.EVT_TIMER, this.TimerId) {|event| this.OnTimer(event)}
@@ -137,7 +140,7 @@ ImageViewer = class(wx.Panel) {
 			if (containerInfo.expandFlag) {
 				y += htMgnTop
 				nRows = int((containerInfo.imageInfos.len() + nCols - 1) / nCols)
-				htImages = nRows * sizeThumbnail
+				htImages = nRows * (sizeThumbnail + htLabel)
 				if (nRows > 1) { htImages += (nRows - 1) * htSkip }
 				y += htImages
 			}
@@ -151,12 +154,12 @@ ImageViewer = class(wx.Panel) {
 		dc.Clear()
 		dc.SetPen(wx.NullPen)
 		dc.SetBrush(this.brushSlot)
-		dc.SetFont(this.font)
 		this.containerInfos.each {|containerInfo|
 			y = containerInfo.y
 			imageInfos = containerInfo.imageInfos
 			dc.SetBrush(this.brushSeparator)
 			dc.DrawRectangle(0, y, wdClient, htSeparator)
+			dc.SetFont(this.fontBold)
 			dc.DrawText(cond(containerInfo.expandFlag, '-', '+'), 0, y)
 			str = containerInfo.dirName.mid(containerInfo.dirNameTop.len() + 1)
 			if (m = str.match(r'(.*)#\d*')) {
@@ -164,10 +167,10 @@ ImageViewer = class(wx.Panel) {
 				dc.SetTextForeground(wx.BLACK)
 				dc.DrawText(str, 20, y)
 				[wdStr, htStr] = dc.GetTextExtent(str)
-				dc.SetFont(this.fontUL)
+				dc.SetFont(this.fontBoldUL)
 				dc.SetTextForeground(wx.Colour(0, 0, 255))
 				dc.DrawText('Click to Fill Name'$, 20 + wdStr, y)
-				dc.SetFont(this.font)
+				dc.SetFont(this.fontBold)
 				dc.SetTextForeground(wx.BLACK)
 			} else {
 				dc.DrawText(str, 20, y)
@@ -179,13 +182,19 @@ ImageViewer = class(wx.Panel) {
 				xsSlot = wdMgnLeft + \
 					(range(imageInfos.len()) % nCols) * (sizeThumbnail + wdSkip)
 				ysSlot = y + htSeparator + htMgnTop + \
-					int(range(imageInfos.len()) / nCols) * (sizeThumbnail + htSkip)
+					int(range(imageInfos.len()) / nCols) * (sizeThumbnail + htLabel + htSkip)
 				dc.DrawRectangle(xsSlot, ysSlot, sizeThumbnail, sizeThumbnail)
+				dc.SetFont(this.font)
 				for (imageInfo in imageInfos, xSlot in xsSlot, ySlot in ysSlot) {
 					!imageInfo.image && continue
 					xImage = xSlot + (sizeThumbnail - imageInfo.image.width) / 2
 					yImage = ySlot + (sizeThumbnail - imageInfo.image.height) / 2
 					dc.DrawBitmap(imageInfo.image, xImage, yImage, false)
+					str = path.filename(imageInfo.pathName)
+					[wdStr, htStr] = dc.GetTextExtent(str)
+					xStr = xSlot + (sizeThumbnail - wdStr) / 2
+					yStr = ySlot + sizeThumbnail
+					dc.DrawText(str, xStr, yStr)
 				}
 			}
 		}
@@ -321,7 +330,7 @@ MainPanel = class(wx.Panel) {
 					this.OnBtn_StorageBrowse(event)
 				}
 			}
-			wx.StaticText(this, wx.ID_ANY, 'Pattern'$) {|ctrl|
+			wx.StaticText(this, wx.ID_ANY, 'Pathname Pattern'$) {|ctrl|
 				gbox.Add(ctrl, wx.SizerFlags())
 			}
 			wx.StaticText(this, wx.ID_ANY, '', style => wx.SUNKEN_BORDER) {|ctrl|
