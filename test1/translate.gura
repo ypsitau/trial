@@ -2,13 +2,13 @@
 transDicts = %{
 `ja => %{
 'Pattern Editor'				=> 'パターンエディタ'
-'Media'							=> 'メディア'
-'Storage'						=> '格納場所'
+'Media Folder'					=> 'メディアフォルダ'
+'Storage Folder'				=> '格納先フォルダ'
 'Browse'						=> '選択'
 'Pattern'						=> 'パターン'
 'Edit'							=> '編集'
 'Run'							=> '実行'
-'Choose a storage directory'	=> '格納場所を選択してください'
+'Choose a storage folder'		=> '格納先フォルダを選択してください'
 '%d images'						=> '%d 個のイメージ'
 }
 }

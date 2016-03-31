@@ -140,33 +140,32 @@ ImageViewer = class(wx.Panel) {
 		htRequired = y
 		htScreen = max(htClient, htRequired)
 		this.bmpScreen = wx.BitmapWH(wdClient, htScreen)
-		wx.MemoryDC(this.bmpScreen) {|dc|
-			dc.SetBackground(this.brushBg)
-			dc.Clear()
-			dc.SetPen(wx.NullPen)
-			dc.SetBrush(this.brushSlot)
-			this.containerInfos.each {|containerInfo|
-				y = containerInfo.y
-				imageInfos = containerInfo.imageInfos
-				dc.SetBrush(this.brushSeparator)
-				dc.DrawRectangle(0, y, wdClient, htSeparator)
-				dc.DrawText(cond(containerInfo.expandFlag, '-', '+'), 0, y)
-				dc.DrawText(containerInfo.dirName.mid(containerInfo.dirNameTop.len() + 1), 20, y)
-				str = format('%d images'$, containerInfo.imageInfos.len())
-				[wdText, htText] = dc.GetTextExtent(str)
-				dc.DrawText(str, wdClient - wdText, y)
-				if (containerInfo.expandFlag) {
-					xsSlot = wdMgnLeft + \
-						(range(imageInfos.len()) % nCols) * (sizeThumbnail + wdSkip)
-					ysSlot = y + htSeparator + htMgnTop + \
-						int(range(imageInfos.len()) / nCols) * (sizeThumbnail + htSkip)
-					dc.DrawRectangle(xsSlot, ysSlot, sizeThumbnail, sizeThumbnail)
-					for (imageInfo in imageInfos, xSlot in xsSlot, ySlot in ysSlot) {
-						!imageInfo.image && continue
-						xImage = xSlot + (sizeThumbnail - imageInfo.image.width) / 2
-						yImage = ySlot + (sizeThumbnail - imageInfo.image.height) / 2
-						dc.DrawBitmap(imageInfo.image, xImage, yImage, false)
-					}
+		dc = wx.MemoryDC(this.bmpScreen)
+		dc.SetBackground(this.brushBg)
+		dc.Clear()
+		dc.SetPen(wx.NullPen)
+		dc.SetBrush(this.brushSlot)
+		this.containerInfos.each {|containerInfo|
+			y = containerInfo.y
+			imageInfos = containerInfo.imageInfos
+			dc.SetBrush(this.brushSeparator)
+			dc.DrawRectangle(0, y, wdClient, htSeparator)
+			dc.DrawText(cond(containerInfo.expandFlag, '-', '+'), 0, y)
+			dc.DrawText(containerInfo.dirName.mid(containerInfo.dirNameTop.len() + 1), 20, y)
+			str = format('%d images'$, containerInfo.imageInfos.len())
+			[wdText, htText] = dc.GetTextExtent(str)
+			dc.DrawText(str, wdClient - wdText, y)
+			if (containerInfo.expandFlag) {
+				xsSlot = wdMgnLeft + \
+					(range(imageInfos.len()) % nCols) * (sizeThumbnail + wdSkip)
+				ysSlot = y + htSeparator + htMgnTop + \
+					int(range(imageInfos.len()) / nCols) * (sizeThumbnail + htSkip)
+				dc.DrawRectangle(xsSlot, ysSlot, sizeThumbnail, sizeThumbnail)
+				for (imageInfo in imageInfos, xSlot in xsSlot, ySlot in ysSlot) {
+					!imageInfo.image && continue
+					xImage = xSlot + (sizeThumbnail - imageInfo.image.width) / 2
+					yImage = ySlot + (sizeThumbnail - imageInfo.image.height) / 2
+					dc.DrawBitmap(imageInfo.image, xImage, yImage, false)
 				}
 			}
 		}
@@ -276,7 +275,7 @@ MainPanel = class(wx.Panel) {
 		wx.FlexGridSizer(nil, 3, 4, 4) {|gbox|
 			gbox.AddGrowableCol(1, 1)
 			vbox.Add(gbox, wx.SizerFlags().Expand())
-			wx.StaticText(this, wx.ID_ANY, 'Media'$) {|ctrl|
+			wx.StaticText(this, wx.ID_ANY, 'Media Folder'$) {|ctrl|
 				gbox.Add(ctrl, wx.SizerFlags())
 			}
 			wx.TextCtrl(this, wx.ID_ANY) {|ctrl|
@@ -289,7 +288,7 @@ MainPanel = class(wx.Panel) {
 					this.OnBtn_MediaBrowse(event)
 				}
 			}
-			wx.StaticText(this, wx.ID_ANY, 'Storage'$) {|ctrl|
+			wx.StaticText(this, wx.ID_ANY, 'Storage Folder'$) {|ctrl|
 				gbox.Add(ctrl, wx.SizerFlags())
 			}
 			wx.TextCtrl(this, wx.ID_ANY, wx.GetApp().cfg['dirNameStorage']) {|ctrl|
@@ -332,7 +331,7 @@ MainPanel = class(wx.Panel) {
 	OnBtn_StorageBrowse(event:wx.CommandEvent) = {
 		dirName = this.textStorage.GetValue()
 		style = wx.DD_DEFAULT_STYLE | wx.DD_DIR_MUST_EXIST
-		dlg = wx.DirDialog(this, 'Choose a storage directory'$
+		dlg = wx.DirDialog(this, 'Choose a storage folder'$
 						   dirName, style)
 		if (dlg.ShowModal() == wx.ID_OK) {
 			dirName = dlg.GetPath()
