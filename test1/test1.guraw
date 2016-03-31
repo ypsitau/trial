@@ -10,11 +10,18 @@ App = class(wx.App) {
 		cfg
 	}
 	OnInit() = {
-		this.cfg = %{}
+		this.cfg = %{
+			'substPatFolder'	=> '${YYYY}/${YYYY}${MM}${DD}'
+			'substPatFile'		=> '${YYYY}_${MM}${DD}_${hh}${mm}${ss}${SEQ}'
+		}
+		this.cfg['dirNameMedia'] = '/Volumes/NO NAME'
 		this.cfg['dirNameStorage'] = '/Users/ypsitau/Pictures'
-		frame = MainFrame()
-		frame.Show()
-		true
+		//frame = MainFrame()
+		//frame.Show()
+		//true
+		dlg = PatternEditorDialog(nil)
+		dlg.ShowModal()
+		false
 	}
 }
 
@@ -34,49 +41,93 @@ PatternEditorPanel = class(wx.Panel) {
 		vbox = wx.BoxSizer(wx.VERTICAL)
 		outerBox.Add(vbox, wx.SizerFlags(1).Expand().Border(wx.ALL, 2))
 		str = '${YYYY}/${YYYY}${MM}${DD}/${YYYY}_${MM}${DD}_${hh}${mm}${ss}${SEQ}'
-		wx.TextCtrl(this, wx.ID_ANY, str) {|ctrl|
-			vbox.Add(ctrl, wx.SizerFlags().Expand().Border(wx.TOP, 4))
-			ctrl.Bind(wx.EVT_TEXT) {|event| this.OnText(event)}
-			this.textEnter = ctrl
+		wx.StaticBox(this, wx.ID_ANY, 'Substitution Pattern'$) {|stb|
+			vboxIn = wx.StaticBoxSizer(stb, wx.VERTICAL)
+			vbox.Add(vboxIn, wx.SizerFlags().Expand())
+			gbox = wx.FlexGridSizer(nil, 2, 4, 8)
+			vboxIn.Add(gbox, wx.SizerFlags().Expand())
+			gbox.AddGrowableCol(1, 1)
+			wx.StaticText(this, wx.ID_ANY, 'Folder Name'$) {|ctrl|
+				gbox.Add(ctrl, wx.SizerFlags().Expand())
+			}
+			wx.TextCtrl(this, wx.ID_ANY, wx.GetApp().cfg['substPatFolder']) {|ctrl|
+				gbox.Add(ctrl, wx.SizerFlags(1).Expand())
+				ctrl.Bind(wx.EVT_TEXT) {|event| this.OnText(event)}
+				this.textSubstPatFolder = ctrl
+			}
+			wx.StaticText(this, wx.ID_ANY, 'File Name'$) {|ctrl|
+				gbox.Add(ctrl, wx.SizerFlags().Expand())
+			}
+			wx.TextCtrl(this, wx.ID_ANY, wx.GetApp().cfg['substPatFile']) {|ctrl|
+				gbox.Add(ctrl, wx.SizerFlags(1).Expand())
+				ctrl.Bind(wx.EVT_TEXT) {|event| this.OnText(event)}
+				this.textSubstPatFile = ctrl
+			}
 		}
-		wx.StaticText(this, wx.ID_ANY,
-					  format('Sample: '$ + '%s-%s-%s %s:%s:%s', YYYY, MM, DD, hh, mm, ss)) {|ctrl|
-			vbox.Add(ctrl, wx.SizerFlags().Expand().Border(wx.TOP, 4))
+		str = format('Sample: '$ + '%s-%s-%s %s:%s:%s', YYYY, MM, DD, hh, mm, ss)
+		wx.StaticBox(this, wx.ID_ANY, str) {|stb|
+			vboxIn = wx.StaticBoxSizer(stb, wx.VERTICAL)
+			vbox.Add(vboxIn, wx.SizerFlags().Expand().Border(wx.TOP, 8))
+			gbox = wx.FlexGridSizer(nil, 2, 4, 8)
+			vboxIn.Add(gbox, wx.SizerFlags().Expand())
+			gbox.AddGrowableCol(1, 1)
+			wx.StaticText(this, wx.ID_ANY, 'Folder Name'$) {|ctrl|
+				gbox.Add(ctrl, wx.SizerFlags().Expand())
+			}
+			wx.StaticText(this, wx.ID_ANY, '',
+						  style => wx.SUNKEN_BORDER | wx.ST_NO_AUTORESIZE) {|ctrl|
+				gbox.Add(ctrl, wx.SizerFlags(1).Expand())
+				this.labelResultFolder = ctrl
+			}
+			wx.StaticText(this, wx.ID_ANY, 'File Name'$) {|ctrl|
+				gbox.Add(ctrl, wx.SizerFlags().Expand())
+			}
+			wx.StaticText(this, wx.ID_ANY, '',
+						  style => wx.SUNKEN_BORDER | wx.ST_NO_AUTORESIZE) {|ctrl|
+				gbox.Add(ctrl, wx.SizerFlags(1).Expand())
+				this.labelResultFile = ctrl
+			}
 		}
-		wx.TextCtrl(this, wx.ID_ANY) {|ctrl|
-			vbox.Add(ctrl, wx.SizerFlags().Expand().Border(wx.TOP, 4))
-			this.textLog = ctrl
+		wx.Button(this, wx.ID_OK, 'OK'$) {|ctrl|
+			vbox.Add(ctrl, wx.SizerFlags().Border(wx.TOP, 8).Align(wx.ALIGN_CENTRE))
 		}
 		this.timer = wx.Timer(this, TimerId)
 		this.Bind(wx.EVT_TIMER, this.TimerId) {|event| this.OnTimer(event)}
-		this.UpdateSample()
+		this.UpdateSample(this.textSubstPatFolder, this.labelResultFolder)
+		this.UpdateSample(this.textSubstPatFile, this.labelResultFile)
 	}
 	OnText(event:wx.CommandEvent) = {
 		this.timer.Start(500, true)
 	}
 	OnTimer(event:wx.TimerEvent) = {
-		this.UpdateSample()
+		this.UpdateSample(this.textSubstPatFolder, this.labelResultFolder)
+		this.UpdateSample(this.textSubstPatFile, this.labelResultFile)
 	}
-	UpdateSample() = {
-		strTmpl = this.textEnter.GetValue()
+	UpdateSample(textSubstPat:wx.TextCtrl, labelResult:wx.StaticText) = {
+		strTmpl = textSubstPat.GetValue()
 		try {
 			str = strTmpl.embed()
-			this.textLog.SetForegroundColour(wx.BLACK)
-			this.textLog.SetValue(str)
+			labelResult.SetForegroundColour(wx.BLACK)
+			labelResult.SetLabel(str)
 		} catch {|e|
-			this.textLog.SetForegroundColour(wx.RED)
-			this.textLog.SetValue(e.text)
+			labelResult.SetForegroundColour(wx.RED)
+			labelResult.SetLabel(e.text)
 		}
 	}
 }
 
-PatternEditorFrame = class(wx.Frame) {
-	__init__(pos:wx.Point => wx.DefaultPosition) = \
-					{|nil, wx.ID_ANY, 'Pattern Editor'$, pos, wx.Size(800, 300)|
+PatternEditorDialog = class(wx.Dialog) {
+	__init__(parent:wx.Window:nil, pos:wx.Point => wx.DefaultPosition) = \
+		{|parent, wx.ID_ANY, 'Pattern Editor'$, pos, wx.Size(600, 300),
+		  style => wx.DEFAULT_DIALOG_STYLE|
 		this.SetIcon(wx.IconFromXPMData(resource.sample_xpm))
-		menuBar = wx.MenuBar()
-		PatternEditorPanel(this)
-		this.SetMenuBar(menuBar)
+		outerBox = wx.BoxSizer(wx.VERTICAL)
+		this.SetSizer(outerBox)
+		vbox = wx.BoxSizer(wx.VERTICAL)
+		outerBox.Add(vbox, wx.SizerFlags(1).Expand().Border(wx.ALL, 2))
+		PatternEditorPanel(this) {|ctrl|
+			vbox.Add(ctrl, wx.SizerFlags(1).Expand())
+		}
 	}
 }
 
@@ -302,12 +353,13 @@ MainPanel = class(wx.Panel) {
 		vbox = wx.BoxSizer(wx.VERTICAL)
 		outerBox.Add(vbox, wx.SizerFlags(1).Expand().Border(wx.ALL, 2))
 		wx.FlexGridSizer(nil, 3, 4, 4) {|gbox|
-			gbox.AddGrowableCol(1, 1)
 			vbox.Add(gbox, wx.SizerFlags().Expand())
+			gbox.AddGrowableCol(1, 1)
 			wx.StaticText(this, wx.ID_ANY, 'Media Folder'$) {|ctrl|
 				gbox.Add(ctrl, wx.SizerFlags())
 			}
-			wx.TextCtrl(this, wx.ID_ANY) {|ctrl|
+			wx.StaticText(this, wx.ID_ANY, wx.GetApp().cfg['dirNameMedia'],
+						  style => wx.SUNKEN_BORDER) {|ctrl|
 				gbox.Add(ctrl, wx.SizerFlags().Expand())
 				this.textMedia = ctrl
 			}
@@ -320,7 +372,8 @@ MainPanel = class(wx.Panel) {
 			wx.StaticText(this, wx.ID_ANY, 'Storage Folder'$) {|ctrl|
 				gbox.Add(ctrl, wx.SizerFlags())
 			}
-			wx.TextCtrl(this, wx.ID_ANY, wx.GetApp().cfg['dirNameStorage']) {|ctrl|
+			wx.StaticText(this, wx.ID_ANY, wx.GetApp().cfg['dirNameStorage'],
+						  style => wx.SUNKEN_BORDER) {|ctrl|
 				gbox.Add(ctrl, wx.SizerFlags().Expand())
 				this.textStorage = ctrl
 			}
@@ -330,14 +383,25 @@ MainPanel = class(wx.Panel) {
 					this.OnBtn_StorageBrowse(event)
 				}
 			}
-			wx.StaticText(this, wx.ID_ANY, 'Pathname Pattern'$) {|ctrl|
+			wx.StaticText(this, wx.ID_ANY, 'Substitution Pattern'$) {|ctrl|
 				gbox.Add(ctrl, wx.SizerFlags())
 			}
-			wx.StaticText(this, wx.ID_ANY, '', style => wx.SUNKEN_BORDER) {|ctrl|
-				gbox.Add(ctrl, wx.SizerFlags().Expand())
+			wx.BoxSizer(wx.HORIZONTAL) {|hbox|
+				gbox.Add(hbox, wx.SizerFlags(1).Expand())
+				wx.StaticText(this, wx.ID_ANY, wx.GetApp().cfg['substPatFolder'],
+							  style => wx.SUNKEN_BORDER) {|ctrl|
+					hbox.Add(ctrl, wx.SizerFlags(1).Expand())
+				}
+				wx.StaticText(this, wx.ID_ANY, wx.GetApp().cfg['substPatFile'],
+							  style => wx.SUNKEN_BORDER) {|ctrl|
+					hbox.Add(ctrl, wx.SizerFlags(1).Expand().Border(wx.LEFT, 4))
+				}
 			}
 			wx.Button(this, wx.ID_ANY, 'Edit'$) {|ctrl|
 				gbox.Add(ctrl, wx.SizerFlags())
+				this.Bind(wx.EVT_BUTTON, ctrl.GetId()) {|event|
+					this.OnBtn_PatternEdit(event)
+				}
 			}
 		}
 		wx.BoxSizer(wx.HORIZONTAL) {|hbox|
@@ -368,6 +432,10 @@ MainPanel = class(wx.Panel) {
 			this.imageViewer.UpdateContainerInfos(dirName)
 			this.imageViewer.UpdateContent()
 		}
+	}
+	OnBtn_PatternEdit(event:wx.CommandEvent) = {
+		dlg = PatternEditorDialog(this)
+		dlg.ShowModal()
 	}
 }
 

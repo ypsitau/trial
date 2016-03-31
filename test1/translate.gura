@@ -5,12 +5,16 @@ transDicts = %{
 'Media Folder'					=> 'メディアフォルダ'
 'Storage Folder'				=> '格納先フォルダ'
 'Browse'						=> '選択'
-'Pathname Pattern'				=> 'パス名パターン'
+'Substitution Pattern'			=> '置換パターン'
+'Folder Name'					=> 'フォルダ名'
+'File Name'						=> 'ファイル名'
 'Edit'							=> '編集'
 'Run'							=> '実行'
 'Choose a storage folder'		=> '格納先フォルダを選択してください'
 '%d images'						=> '%d 個のイメージ'
 'Click to Fill Name'			=> 'クリックして名前を入力'
+'Result'						=> '結果'
+'Sample: '						=> 'サンプル: '
 }
 }
 
