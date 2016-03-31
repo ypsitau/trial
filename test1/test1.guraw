@@ -2,6 +2,7 @@
 import(wx)
 import(jpeg)
 import(resource)
+import(translate)
 
 App = class(wx.App) {
 	public {
@@ -151,7 +152,7 @@ ImageViewer = class(wx.Panel) {
 				dc.DrawRectangle(0, y, wdClient, htSeparator)
 				dc.DrawText(cond(containerInfo.expandFlag, '-', '+'), 0, y)
 				dc.DrawText(containerInfo.dirName.mid(containerInfo.dirNameTop.len() + 1), 20, y)
-				str = format('%d images', containerInfo.imageInfos.len())
+				str = format('%d images'$, containerInfo.imageInfos.len())
 				[wdText, htText] = dc.GetTextExtent(str)
 				dc.DrawText(str, wdClient - wdText, y)
 				if (containerInfo.expandFlag) {

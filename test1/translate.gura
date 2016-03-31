@@ -1,0 +1,17 @@
+# -*- coding: utf-8 -*-
+transDicts = %{
+`ja => %{
+'Pattern Editor'				=> 'パターンエディタ'
+'Media'							=> 'メディア'
+'Storage'						=> '格納場所'
+'Browse'						=> '選択'
+'Pattern'						=> 'パターン'
+'Edit'							=> '編集'
+'Run'							=> '実行'
+'Choose a storage directory'	=> '格納場所を選択してください'
+'%d images'						=> '%d 個のイメージ'
+}
+}
+
+(transDict = transDicts.get(sys.langcode)) && string.translator {|x| transDict.get(x, x)}
+_(x:string) = cond(transDict, transDict.get(x, x), x)
