@@ -10,6 +10,7 @@ transDicts = %{
 'Run'							=> '実行'
 'Choose a storage folder'		=> '格納先フォルダを選択してください'
 '%d images'						=> '%d 個のイメージ'
+'Click to Fill Name'			=> 'クリックして名前を入力'
 }
 }
 

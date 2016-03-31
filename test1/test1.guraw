@@ -1,4 +1,5 @@
 #!/usr/bin/env gura
+import(re)
 import(wx)
 import(jpeg)
 import(resource)
@@ -100,6 +101,11 @@ ImageViewer = class(wx.Panel) {
 		this.containerInfos = []
 		this.timer = wx.Timer(this, TimerId)
 		this.imageInfoQue = []
+		this.font = wx.Font(11, wx.FONTFAMILY_DEFAULT, wx.FONTSTYLE_NORMAL,
+							wx.FONTWEIGHT_BOLD)
+		this.fontUL = wx.Font(11, wx.FONTFAMILY_DEFAULT, wx.FONTSTYLE_NORMAL,
+							  wx.FONTWEIGHT_NORMAL)
+		this.fontUL.SetUnderlined(true)
 		this.Bind(wx.EVT_ERASE_BACKGROUND) { /* nothing to do */ }
 		this.Bind(wx.EVT_SIZE) {|event| this.OnSize(event)}
 		this.Bind(wx.EVT_TIMER, this.TimerId) {|event| this.OnTimer(event)}
@@ -145,16 +151,30 @@ ImageViewer = class(wx.Panel) {
 		dc.Clear()
 		dc.SetPen(wx.NullPen)
 		dc.SetBrush(this.brushSlot)
+		dc.SetFont(this.font)
 		this.containerInfos.each {|containerInfo|
 			y = containerInfo.y
 			imageInfos = containerInfo.imageInfos
 			dc.SetBrush(this.brushSeparator)
 			dc.DrawRectangle(0, y, wdClient, htSeparator)
 			dc.DrawText(cond(containerInfo.expandFlag, '-', '+'), 0, y)
-			dc.DrawText(containerInfo.dirName.mid(containerInfo.dirNameTop.len() + 1), 20, y)
+			str = containerInfo.dirName.mid(containerInfo.dirNameTop.len() + 1)
+			if (m = str.match(r'(.*)#\d*')) {
+				str = m[1]
+				dc.SetTextForeground(wx.BLACK)
+				dc.DrawText(str, 20, y)
+				[wdStr, htStr] = dc.GetTextExtent(str)
+				dc.SetFont(this.fontUL)
+				dc.SetTextForeground(wx.Colour(0, 0, 255))
+				dc.DrawText('Click to Fill Name'$, 20 + wdStr, y)
+				dc.SetFont(this.font)
+				dc.SetTextForeground(wx.BLACK)
+			} else {
+				dc.DrawText(str, 20, y)
+			}
 			str = format('%d images'$, containerInfo.imageInfos.len())
-			[wdText, htText] = dc.GetTextExtent(str)
-			dc.DrawText(str, wdClient - wdText, y)
+			[wdStr, htStr] = dc.GetTextExtent(str)
+			dc.DrawText(str, wdClient - wdStr, y)
 			if (containerInfo.expandFlag) {
 				xsSlot = wdMgnLeft + \
 					(range(imageInfos.len()) % nCols) * (sizeThumbnail + wdSkip)
@@ -331,8 +351,7 @@ MainPanel = class(wx.Panel) {
 	OnBtn_StorageBrowse(event:wx.CommandEvent) = {
 		dirName = this.textStorage.GetValue()
 		style = wx.DD_DEFAULT_STYLE | wx.DD_DIR_MUST_EXIST
-		dlg = wx.DirDialog(this, 'Choose a storage folder'$
-						   dirName, style)
+		dlg = wx.DirDialog(this, 'Choose a storage folder'$, dirName, style)
 		if (dlg.ShowModal() == wx.ID_OK) {
 			dirName = dlg.GetPath()
 			wx.GetApp().cfg['dirNameStorage'] = dirName
