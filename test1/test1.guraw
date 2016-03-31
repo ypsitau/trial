@@ -4,7 +4,12 @@ import(jpeg)
 import(resource)
 
 App = class(wx.App) {
+	public {
+		cfg
+	}
 	OnInit() = {
+		this.cfg = %{}
+		this.cfg['dirNameStorage'] = '/Users/ypsitau/Pictures'
 		frame = MainFrame()
 		frame.Show()
 		true
@@ -75,17 +80,22 @@ PatternEditorFrame = class(wx.Frame) {
 
 ImageInfo = struct(pathName:string, image:image:nil):map
 
-ContainerInfo = struct(dirName:string, imageInfos[]:ImageInfo,
+ContainerInfo = struct(dirName:string, dirNameTop, imageInfos[]:ImageInfo,
 					   y:number, rcExpand:wx.Rect, expandFlag:boolean)
 
 ImageViewer = class(wx.Panel) {
 	TimerId = 1
-	SizeThumbnail = 150
+	sizeThumbnail = 180
+	wdSkip = 8, htSkip = 8
+	htSeparator = 20
+	wdMgnLeft = 20, wdMgnRight = 4
+	htMgnTop = 4, htMgnBottom = 8
 	__init__(parent:wx.Windowm, style:number) = \
 						{|parent, style => (style | wx.HSCROLL | wx.VSCROLL)|
 		this.bmpScreen = nil
 		this.brushBg = wx.Brush(wx.WHITE, wx.BRUSHSTYLE_SOLID)
 		this.brushSlot = wx.Brush(wx.Colour(200, 200, 200), wx.BRUSHSTYLE_SOLID)
+		this.brushSeparator = wx.Brush(wx.Colour(240, 240, 240), wx.BRUSHSTYLE_SOLID)
 		this.containerInfos = []
 		this.timer = wx.Timer(this, TimerId)
 		this.imageInfoQue = []
@@ -99,42 +109,32 @@ ImageViewer = class(wx.Panel) {
 		this.Bind(wx.EVT_LEFT_UP) {|event| this.OnLeftUp(event)}
 		this.Bind(wx.EVT_MOTION) {|event| this.OnMotion(event)}
 		this.Bind(wx.EVT_IDLE) {|event| this.OnIdle(event)}
-		this.UpdateContainerInfos()
 	}
-	UpdateContainerInfos() = {
-		dirNameTop = '/Users/ypsitau/Pictures'
+	UpdateContainerInfos(dirNameTop:string) = {
 		dirNames = (path.walk(dirNameTop, 1, '*'):dir).sort(`descend):list
 		this.containerInfos = dirNames.each():xlist {|dirName|
 			pathNames = [path.dir(dirName, '*.JPG', '*.jpg', '*.JPEG', '*.jpeg')]
 			pathNames.isempty() && continue
-			ContainerInfo(dirName, ImageInfo(pathNames, nil), 0, wx.Rect(0, 0, 10, 20), false)
+			ContainerInfo(dirName.chop(), dirNameTop,
+						  ImageInfo(pathNames, nil), 0, wx.Rect(0, 0, 10, 20), false)
 		}
 	}
 	UpdateContent() = {
-		wdMgnLeft = 20
-		wdSkip = 8, htSkip = 8
-		htLine = 20
 		[wdClient, htClient] = this.GetClientSizeWH()
 		y = 0
-		nCols = int((wdClient - wdMgnLeft + wdSkip) / (SizeThumbnail + wdSkip))
+		nCols = int((wdClient - (wdMgnLeft + wdMgnRight) + wdSkip) / (sizeThumbnail + wdSkip))
 		this.containerInfos.each {|containerInfo|
 			containerInfo.y = y
 			containerInfo.rcExpand.y = y
-			y += htLine
+			y += htSeparator
 			if (containerInfo.expandFlag) {
-				containerInfo.imageInfos.each {|imageInfo|
-					imageInfo.image && continue
-					try {
-						//imageInfo.image = image(imageInfo.pathName).thumbnail(SizeThumbnail):box
-					} catch {
-						imageInfo.image = nil
-					}
-				}
+				y += htMgnTop
 				nRows = int((containerInfo.imageInfos.len() + nCols - 1) / nCols)
-				htImages = nRows * SizeThumbnail
+				htImages = nRows * sizeThumbnail
 				if (nRows > 1) { htImages += (nRows - 1) * htSkip }
 				y += htImages
 			}
+			y += htMgnBottom
 		}
 		htRequired = y
 		htScreen = max(htClient, htRequired)
@@ -147,17 +147,23 @@ ImageViewer = class(wx.Panel) {
 			this.containerInfos.each {|containerInfo|
 				y = containerInfo.y
 				imageInfos = containerInfo.imageInfos
+				dc.SetBrush(this.brushSeparator)
+				dc.DrawRectangle(0, y, wdClient, htSeparator)
 				dc.DrawText(cond(containerInfo.expandFlag, '-', '+'), 0, y)
-				dc.DrawText(format('%s [%d images]', containerInfo.dirName,
-								   containerInfo.imageInfos.len()), 20, y)
+				dc.DrawText(containerInfo.dirName.mid(containerInfo.dirNameTop.len() + 1), 20, y)
+				str = format('%d images', containerInfo.imageInfos.len())
+				[wdText, htText] = dc.GetTextExtent(str)
+				dc.DrawText(str, wdClient - wdText, y)
 				if (containerInfo.expandFlag) {
-					xsSlot = wdMgnLeft + (range(imageInfos.len()) % nCols) * (SizeThumbnail + wdSkip)
-					ysSlot = y + htLine + int(range(imageInfos.len()) / nCols) * (SizeThumbnail + htSkip)
-					dc.DrawRectangle(xsSlot, ysSlot, SizeThumbnail, SizeThumbnail)
+					xsSlot = wdMgnLeft + \
+						(range(imageInfos.len()) % nCols) * (sizeThumbnail + wdSkip)
+					ysSlot = y + htSeparator + htMgnTop + \
+						int(range(imageInfos.len()) / nCols) * (sizeThumbnail + htSkip)
+					dc.DrawRectangle(xsSlot, ysSlot, sizeThumbnail, sizeThumbnail)
 					for (imageInfo in imageInfos, xSlot in xsSlot, ySlot in ysSlot) {
 						!imageInfo.image && continue
-						xImage = xSlot + (SizeThumbnail - imageInfo.image.width) / 2
-						yImage = ySlot + (SizeThumbnail - imageInfo.image.height) / 2
+						xImage = xSlot + (sizeThumbnail - imageInfo.image.width) / 2
+						yImage = ySlot + (sizeThumbnail - imageInfo.image.height) / 2
 						dc.DrawBitmap(imageInfo.image, xImage, yImage, false)
 					}
 				}
@@ -254,7 +260,7 @@ ImageViewer = class(wx.Panel) {
 			this.imageInfoQue.isempty() && break
 			imageInfo = this.imageInfoQue[0]
 			this.imageInfoQue.erase(0)
-			imageInfo.image = image(imageInfo.pathName).thumbnail(SizeThumbnail):box
+			imageInfo.image = image(imageInfo.pathName).thumbnail(sizeThumbnail):box
 		}
 		this.UpdateContent()
 	}
@@ -269,23 +275,31 @@ MainPanel = class(wx.Panel) {
 		wx.FlexGridSizer(nil, 3, 4, 4) {|gbox|
 			gbox.AddGrowableCol(1, 1)
 			vbox.Add(gbox, wx.SizerFlags().Expand())
-			wx.StaticText(this, wx.ID_ANY, 'Source'$) {|ctrl|
+			wx.StaticText(this, wx.ID_ANY, 'Media'$) {|ctrl|
 				gbox.Add(ctrl, wx.SizerFlags())
 			}
 			wx.TextCtrl(this, wx.ID_ANY) {|ctrl|
 				gbox.Add(ctrl, wx.SizerFlags().Expand())
+				this.textMedia = ctrl
 			}
 			wx.Button(this, wx.ID_ANY, 'Browse'$) {|ctrl|
 				gbox.Add(ctrl, wx.SizerFlags())
+				this.Bind(wx.EVT_BUTTON, ctrl.GetId()) {|event|
+					this.OnBtn_MediaBrowse(event)
+				}
 			}
-			wx.StaticText(this, wx.ID_ANY, 'Destination'$) {|ctrl|
+			wx.StaticText(this, wx.ID_ANY, 'Storage'$) {|ctrl|
 				gbox.Add(ctrl, wx.SizerFlags())
 			}
-			wx.TextCtrl(this, wx.ID_ANY) {|ctrl|
+			wx.TextCtrl(this, wx.ID_ANY, wx.GetApp().cfg['dirNameStorage']) {|ctrl|
 				gbox.Add(ctrl, wx.SizerFlags().Expand())
+				this.textStorage = ctrl
 			}
 			wx.Button(this, wx.ID_ANY, 'Browse'$) {|ctrl|
 				gbox.Add(ctrl, wx.SizerFlags())
+				this.Bind(wx.EVT_BUTTON, ctrl.GetId()) {|event|
+					this.OnBtn_StorageBrowse(event)
+				}
 			}
 			wx.StaticText(this, wx.ID_ANY, 'Pattern'$) {|ctrl|
 				gbox.Add(ctrl, wx.SizerFlags())
@@ -308,6 +322,23 @@ MainPanel = class(wx.Panel) {
 		}
 		ImageViewer(this, style => wx.SUNKEN_BORDER) {|ctrl|
 			vbox.Add(ctrl, wx.SizerFlags(1).Expand().Border(wx.TOP, 4))
+			this.imageViewer = ctrl
+		}
+		this.imageViewer.UpdateContainerInfos(wx.GetApp().cfg['dirNameStorage'])
+	}
+	OnBtn_MediaBrowse(event:wx.CommandEvent) = {
+	}
+	OnBtn_StorageBrowse(event:wx.CommandEvent) = {
+		dirName = this.textStorage.GetValue()
+		style = wx.DD_DEFAULT_STYLE | wx.DD_DIR_MUST_EXIST
+		dlg = wx.DirDialog(this, 'Choose a storage directory'$
+						   dirName, style)
+		if (dlg.ShowModal() == wx.ID_OK) {
+			dirName = dlg.GetPath()
+			wx.GetApp().cfg['dirNameStorage'] = dirName
+			this.textStorage.SetValue(dirName)
+			this.imageViewer.UpdateContainerInfos(dirName)
+			this.imageViewer.UpdateContent()
 		}
 	}
 }
