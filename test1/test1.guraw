@@ -366,7 +366,7 @@ MainPanel = class(wx.Panel) {
 			vbox.Add(gbox, wx.SizerFlags().Expand())
 			gbox.AddGrowableCol(1, 1)
 			wx.StaticText(this, wx.ID_ANY, 'Source Folder'$) {|ctrl|
-				gbox.Add(ctrl, wx.SizerFlags())
+				gbox.Add(ctrl, wx.SizerFlags().Align(wx.ALIGN_CENTRE_VERTICAL))
 			}
 			wx.StaticText(this, wx.ID_ANY, wx.GetApp().cfg['dirNameSource'],
 						  style => wx.SUNKEN_BORDER) {|ctrl|
@@ -379,8 +379,9 @@ MainPanel = class(wx.Panel) {
 					this.OnBtn_SourceBrowse(event)
 				}
 			}
+			
 			wx.StaticText(this, wx.ID_ANY, 'Storage Folder'$) {|ctrl|
-				gbox.Add(ctrl, wx.SizerFlags())
+				gbox.Add(ctrl, wx.SizerFlags().Align(wx.ALIGN_CENTRE_VERTICAL))
 			}
 			wx.StaticText(this, wx.ID_ANY, wx.GetApp().cfg['dirNameStorage'],
 						  style => wx.SUNKEN_BORDER) {|ctrl|
