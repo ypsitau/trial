@@ -16,12 +16,12 @@ App = class(wx.App) {
 		}
 		this.cfg['dirNameMedia'] = '/Volumes/NO NAME'
 		this.cfg['dirNameStorage'] = '/Users/ypsitau/Pictures'
-		//frame = MainFrame()
-		//frame.Show()
-		//true
-		dlg = PatternEditorDialog(nil)
-		dlg.ShowModal()
-		false
+		frame = MainFrame()
+		frame.Show()
+		true
+		//dlg = PatternEditorDialog(nil)
+		//dlg.ShowModal()
+		//false
 	}
 }
 
@@ -88,8 +88,8 @@ PatternEditorPanel = class(wx.Panel) {
 				this.labelResultFile = ctrl
 			}
 		}
-		wx.HtmlWindow(this) {|ctrl|
-			vbox.Add(ctrl, wx.SizerFlags(1).Expand())
+		wx.HtmlWindow(this, style => wx.SUNKEN_BORDER) {|ctrl|
+			vbox.Add(ctrl, wx.SizerFlags(1).Expand().Border(wx.TOP, 8))
 			ctrl.SetPage('@PatternHelp'$)
 		}
 		wx.Button(this, wx.ID_OK, 'OK'$) {|ctrl|
@@ -356,8 +356,17 @@ MainPanel = class(wx.Panel) {
 		this.SetSizer(outerBox)
 		vbox = wx.BoxSizer(wx.VERTICAL)
 		outerBox.Add(vbox, wx.SizerFlags(1).Expand().Border(wx.ALL, 2))
+		wx.BoxSizer(wx.HORIZONTAL) {|hbox|
+			vbox.Add(hbox, wx.SizerFlags().Expand())
+			wx.Button(this, wx.ID_ANY, 'Run'$) {|ctrl|
+				hbox.Add(ctrl, wx.SizerFlags())
+			}
+			wx.Gauge(this, wx.ID_ANY, 100, style => wx.GA_HORIZONTAL) {|ctrl|
+				hbox.Add(ctrl, wx.SizerFlags(1).Expand().Border(wx.LEFT, 4))
+			}
+		}
 		wx.FlexGridSizer(nil, 3, 4, 4) {|gbox|
-			vbox.Add(gbox, wx.SizerFlags().Expand())
+			vbox.Add(gbox, wx.SizerFlags().Expand().Border(wx.TOP, 4))
 			gbox.AddGrowableCol(1, 1)
 			wx.StaticText(this, wx.ID_ANY, 'Media Folder'$) {|ctrl|
 				gbox.Add(ctrl, wx.SizerFlags())
@@ -386,35 +395,6 @@ MainPanel = class(wx.Panel) {
 				this.Bind(wx.EVT_BUTTON, ctrl.GetId()) {|event|
 					this.OnBtn_StorageBrowse(event)
 				}
-			}
-			wx.StaticText(this, wx.ID_ANY, 'Substitution Pattern'$) {|ctrl|
-				gbox.Add(ctrl, wx.SizerFlags())
-			}
-			wx.BoxSizer(wx.HORIZONTAL) {|hbox|
-				gbox.Add(hbox, wx.SizerFlags(1).Expand())
-				wx.StaticText(this, wx.ID_ANY, wx.GetApp().cfg['substPatFolder'],
-							  style => wx.SUNKEN_BORDER) {|ctrl|
-					hbox.Add(ctrl, wx.SizerFlags(1).Expand())
-				}
-				wx.StaticText(this, wx.ID_ANY, wx.GetApp().cfg['substPatFile'],
-							  style => wx.SUNKEN_BORDER) {|ctrl|
-					hbox.Add(ctrl, wx.SizerFlags(1).Expand().Border(wx.LEFT, 4))
-				}
-			}
-			wx.Button(this, wx.ID_ANY, 'Edit'$) {|ctrl|
-				gbox.Add(ctrl, wx.SizerFlags())
-				this.Bind(wx.EVT_BUTTON, ctrl.GetId()) {|event|
-					this.OnBtn_PatternEdit(event)
-				}
-			}
-		}
-		wx.BoxSizer(wx.HORIZONTAL) {|hbox|
-			vbox.Add(hbox, wx.SizerFlags().Expand().Border(wx.TOP, 4))
-			wx.Button(this, wx.ID_ANY, 'Run'$) {|ctrl|
-				hbox.Add(ctrl, wx.SizerFlags())
-			}
-			wx.Gauge(this, wx.ID_ANY, 100, style => wx.GA_HORIZONTAL) {|ctrl|
-				hbox.Add(ctrl, wx.SizerFlags(1).Expand().Border(wx.LEFT, 4))
 			}
 		}
 		ImageViewer(this, style => wx.SUNKEN_BORDER) {|ctrl|
