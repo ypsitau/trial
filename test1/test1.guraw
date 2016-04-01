@@ -12,7 +12,7 @@ App = class(wx.App) {
 	OnInit() = {
 		this.cfg = %{
 			'substPatFolder'	=> '${YYYY}/${YYYY}${MM}${DD}'
-			'substPatFile'		=> '${YYYY}_${MM}${DD}_${hh}${mm}${ss}${SEQ}'
+			'substPatFile'		=> '${YYYY}_${MM}${DD}_${hh}${mm}${ss}${QQ}'
 		}
 		this.cfg['dirNameMedia'] = '/Volumes/NO NAME'
 		this.cfg['dirNameStorage'] = '/Users/ypsitau/Pictures'
@@ -34,13 +34,13 @@ PatternEditorPanel = class(wx.Panel) {
 	hh = '13'
 	mm = '24'
 	ss = '47'
-	SEQ = 'AA'
+	QQ = 'AA'
 	__init__(parent:wx.Windowm) = {|parent|
 		outerBox = wx.BoxSizer(wx.VERTICAL)
 		this.SetSizer(outerBox)
 		vbox = wx.BoxSizer(wx.VERTICAL)
 		outerBox.Add(vbox, wx.SizerFlags(1).Expand().Border(wx.ALL, 2))
-		str = '${YYYY}/${YYYY}${MM}${DD}/${YYYY}_${MM}${DD}_${hh}${mm}${ss}${SEQ}'
+		str = '${YYYY}/${YYYY}${MM}${DD}/${YYYY}_${MM}${DD}_${hh}${mm}${ss}${QQ}'
 		wx.StaticBox(this, wx.ID_ANY, 'Substitution Pattern'$) {|stb|
 			vboxIn = wx.StaticBoxSizer(stb, wx.VERTICAL)
 			vbox.Add(vboxIn, wx.SizerFlags().Expand())
@@ -88,6 +88,10 @@ PatternEditorPanel = class(wx.Panel) {
 				this.labelResultFile = ctrl
 			}
 		}
+		wx.HtmlWindow(this) {|ctrl|
+			vbox.Add(ctrl, wx.SizerFlags(1).Expand())
+			ctrl.SetPage('@PatternHelp'$)
+		}
 		wx.Button(this, wx.ID_OK, 'OK'$) {|ctrl|
 			vbox.Add(ctrl, wx.SizerFlags().Border(wx.TOP, 8).Align(wx.ALIGN_CENTRE))
 		}
@@ -118,7 +122,7 @@ PatternEditorPanel = class(wx.Panel) {
 
 PatternEditorDialog = class(wx.Dialog) {
 	__init__(parent:wx.Window:nil, pos:wx.Point => wx.DefaultPosition) = \
-		{|parent, wx.ID_ANY, 'Pattern Editor'$, pos, wx.Size(600, 300),
+		{|parent, wx.ID_ANY, 'Pattern Editor'$, pos, wx.Size(600, 500),
 		  style => wx.DEFAULT_DIALOG_STYLE|
 		this.SetIcon(wx.IconFromXPMData(resource.sample_xpm))
 		outerBox = wx.BoxSizer(wx.VERTICAL)

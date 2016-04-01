@@ -1,6 +1,38 @@
 # -*- coding: utf-8 -*-
 transDicts = %{
+`en => %{
+'@PatternHelp' => R'''
+<html><body>
+<table>
+<tr><th align="left">Variable</th><th align="left">Content</th><th align="left">Example</th></tr>
+<tr><td><code>${YYYY}</code></td><td>Four digits of the year.</td><td><code>2015</code></td></tr>
+<tr><td><code>${YY}</code></td><td>Lower two digits of the year.</td><td><code>15</code></td></tr>
+<tr><td><code>${MM}</code></td><td>Two digits of the month.</td><td><code>03</code></td></tr>
+<tr><td><code>${DD}</code></td><td>Two digits of the day.</td><td><code>21</code></td></tr>
+<tr><td><code>${hh}</code></td><td>Two digits of the hour in 24-hour display.</td><td><code>13</code></td></tr>
+<tr><td><code>${mm}</code></td><td>Two digits of the minute.</td><td><code>24</code></td></tr>
+<tr><td><code>${ss}</code></td><td>Two digits of the second.</td><td><code>47</code></td></tr>
+<tr><td><code>${QQ}</code></td><td>Two alphabet characters to avoid duplex.</td><td><code>AA</code></td></tr>
+</table>
+</body></html>
+'''
+}
 `ja => %{
+'@PatternHelp' => R'''
+<html><body>
+<table>
+<tr><th align="left">変数</th><th align="left">内容</th><th align="left">例</th></tr>
+<tr><td><code>${YYYY}</code></td><td>４桁の「年」</td><td><code>2015</code></td></tr>
+<tr><td><code>${YY}</code></td><td>下位２桁の「年」</td><td><code>15</code></td></tr>
+<tr><td><code>${MM}</code></td><td>２桁の「月」</td><td><code>03</code></td></tr>
+<tr><td><code>${DD}</code></td><td>２桁の「日」</td><td><code>21</code></td></tr>
+<tr><td><code>${hh}</code></td><td>２桁の「時」２４時間制</td><td><code>13</code></td></tr>
+<tr><td><code>${mm}</code></td><td>２桁の「分」</td><td><code>24</code></td></tr>
+<tr><td><code>${ss}</code></td><td>２桁の「秒」</td><td><code>47</code></td></tr>
+<tr><td><code>${QQ}</code></td><td>重複を防止するための２桁のアルファベット文字</td><td><code>AA</code></td></tr>
+</table>
+</body></html>
+'''
 'Pattern Editor'				=> 'パターンエディタ'
 'Media Folder'					=> 'メディアフォルダ'
 'Storage Folder'				=> '格納先フォルダ'
