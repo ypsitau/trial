@@ -5,26 +5,16 @@ import(jpeg)
 import(resource)
 import(translate)
 
-App = class(wx.App) {
-	public {
-		cfg
-	}
-	OnInit() = {
-		this.cfg = %{
-			'substPatFolder'	=> '${YYYY}/${YYYY}${MM}${DD}'
-			'substPatFile'		=> '${YYYY}_${MM}${DD}_${hh}${mm}${ss}${QQ}'
-		}
-		this.cfg['dirNameMedia'] = '/Volumes/NO NAME'
-		this.cfg['dirNameStorage'] = '/Users/ypsitau/Pictures'
-		frame = MainFrame()
-		frame.Show()
-		true
-		//dlg = PatternEditorDialog(nil)
-		//dlg.ShowModal()
-		//false
-	}
-}
+//-----------------------------------------------------------------------------
+// Control ID
+//-----------------------------------------------------------------------------
+[
+	ID_EditPattern
+] = wx.ID_HIGHEST..
 
+//-----------------------------------------------------------------------------
+// PatternEditorPanel
+//-----------------------------------------------------------------------------
 PatternEditorPanel = class(wx.Panel) {
 	TimerId = 1
 	YYYY = '2015'
@@ -35,6 +25,7 @@ PatternEditorPanel = class(wx.Panel) {
 	mm = '24'
 	ss = '47'
 	QQ = 'AA'
+	N = '1'
 	__init__(parent:wx.Windowm) = {|parent|
 		outerBox = wx.BoxSizer(wx.VERTICAL)
 		this.SetSizer(outerBox)
@@ -120,9 +111,12 @@ PatternEditorPanel = class(wx.Panel) {
 	}
 }
 
+//-----------------------------------------------------------------------------
+// PatternEditorDialog
+//-----------------------------------------------------------------------------
 PatternEditorDialog = class(wx.Dialog) {
 	__init__(parent:wx.Window:nil, pos:wx.Point => wx.DefaultPosition) = \
-		{|parent, wx.ID_ANY, 'Pattern Editor'$, pos, wx.Size(600, 500),
+		{|parent, wx.ID_ANY, 'Edit Pattern'$, pos, wx.Size(600, 500),
 		  style => wx.DEFAULT_DIALOG_STYLE|
 		this.SetIcon(wx.IconFromXPMData(resource.sample_xpm))
 		outerBox = wx.BoxSizer(wx.VERTICAL)
@@ -135,11 +129,20 @@ PatternEditorDialog = class(wx.Dialog) {
 	}
 }
 
+//-----------------------------------------------------------------------------
+// ImageInfo
+//-----------------------------------------------------------------------------
 ImageInfo = struct(pathName:string, image:image:nil):map
 
+//-----------------------------------------------------------------------------
+// ContainerInfo
+//-----------------------------------------------------------------------------
 ContainerInfo = struct(dirName:string, dirNameTop, imageInfos[]:ImageInfo,
 					   y:number, rcExpand:wx.Rect, expandFlag:boolean)
 
+//-----------------------------------------------------------------------------
+// ImageViewer
+//-----------------------------------------------------------------------------
 ImageViewer = class(wx.Panel) {
 	TimerId = 1
 	sizeThumbnail = 180
@@ -350,36 +353,30 @@ ImageViewer = class(wx.Panel) {
 	}
 }
 
+//-----------------------------------------------------------------------------
+// MainPanel
+//-----------------------------------------------------------------------------
 MainPanel = class(wx.Panel) {
 	__init__(parent:wx.Windowm) = {|parent|
 		outerBox = wx.BoxSizer(wx.VERTICAL)
 		this.SetSizer(outerBox)
 		vbox = wx.BoxSizer(wx.VERTICAL)
-		outerBox.Add(vbox, wx.SizerFlags(1).Expand().Border(wx.ALL, 2))
-		wx.BoxSizer(wx.HORIZONTAL) {|hbox|
-			vbox.Add(hbox, wx.SizerFlags().Expand())
-			wx.Button(this, wx.ID_ANY, 'Run'$) {|ctrl|
-				hbox.Add(ctrl, wx.SizerFlags())
-			}
-			wx.Gauge(this, wx.ID_ANY, 100, style => wx.GA_HORIZONTAL) {|ctrl|
-				hbox.Add(ctrl, wx.SizerFlags(1).Expand().Border(wx.LEFT, 4))
-			}
-		}
+		outerBox.Add(vbox, wx.SizerFlags(1).Expand().Border(wx.ALL, 4))
 		wx.FlexGridSizer(nil, 3, 4, 4) {|gbox|
-			vbox.Add(gbox, wx.SizerFlags().Expand().Border(wx.TOP, 4))
+			vbox.Add(gbox, wx.SizerFlags().Expand())
 			gbox.AddGrowableCol(1, 1)
-			wx.StaticText(this, wx.ID_ANY, 'Media Folder'$) {|ctrl|
+			wx.StaticText(this, wx.ID_ANY, 'Source Folder'$) {|ctrl|
 				gbox.Add(ctrl, wx.SizerFlags())
 			}
-			wx.StaticText(this, wx.ID_ANY, wx.GetApp().cfg['dirNameMedia'],
+			wx.StaticText(this, wx.ID_ANY, wx.GetApp().cfg['dirNameSource'],
 						  style => wx.SUNKEN_BORDER) {|ctrl|
-				gbox.Add(ctrl, wx.SizerFlags().Expand())
-				this.textMedia = ctrl
+				gbox.Add(ctrl, wx.SizerFlags(1).Expand())
+				this.textSource = ctrl
 			}
 			wx.Button(this, wx.ID_ANY, 'Browse'$) {|ctrl|
 				gbox.Add(ctrl, wx.SizerFlags())
 				this.Bind(wx.EVT_BUTTON, ctrl.GetId()) {|event|
-					this.OnBtn_MediaBrowse(event)
+					this.OnBtn_SourceBrowse(event)
 				}
 			}
 			wx.StaticText(this, wx.ID_ANY, 'Storage Folder'$) {|ctrl|
@@ -387,7 +384,7 @@ MainPanel = class(wx.Panel) {
 			}
 			wx.StaticText(this, wx.ID_ANY, wx.GetApp().cfg['dirNameStorage'],
 						  style => wx.SUNKEN_BORDER) {|ctrl|
-				gbox.Add(ctrl, wx.SizerFlags().Expand())
+				gbox.Add(ctrl, wx.SizerFlags(1).Expand())
 				this.textStorage = ctrl
 			}
 			wx.Button(this, wx.ID_ANY, 'Browse'$) {|ctrl|
@@ -397,18 +394,31 @@ MainPanel = class(wx.Panel) {
 				}
 			}
 		}
+		wx.Button(this, wx.ID_ANY, 'Start to Copy Image Files'$, size => wx.Size(300, -1)) {|ctrl|
+			vbox.Add(ctrl, wx.SizerFlags().Align(wx.CENTRE).Border(wx.TOP, 4))
+		}
 		ImageViewer(this, style => wx.SUNKEN_BORDER) {|ctrl|
 			vbox.Add(ctrl, wx.SizerFlags(1).Expand().Border(wx.TOP, 4))
 			this.imageViewer = ctrl
 		}
 		this.imageViewer.UpdateContainerInfos(wx.GetApp().cfg['dirNameStorage'])
 	}
-	OnBtn_MediaBrowse(event:wx.CommandEvent) = {
+	OnBtn_SourceBrowse(event:wx.CommandEvent) = {
+		style = wx.DD_DEFAULT_STYLE | wx.DD_DIR_MUST_EXIST
+		dlg = wx.DirDialog(this, 'Choose Source Folder'$,
+						   wx.GetApp().cfg['dirNameSource'], style)
+		if (dlg.ShowModal() == wx.ID_OK) {
+			dirName = dlg.GetPath()
+			wx.GetApp().cfg['dirNameSource'] = dirName
+			this.textStorage.SetValue(dirName)
+			this.imageViewer.UpdateContainerInfos(dirName)
+			this.imageViewer.UpdateContent()
+		}
 	}
 	OnBtn_StorageBrowse(event:wx.CommandEvent) = {
-		dirName = this.textStorage.GetValue()
 		style = wx.DD_DEFAULT_STYLE | wx.DD_DIR_MUST_EXIST
-		dlg = wx.DirDialog(this, 'Choose a storage folder'$, dirName, style)
+		dlg = wx.DirDialog(this, 'Choose Storage Folder'$,
+						   wx.GetApp().cfg['dirNameStorage'], style)
 		if (dlg.ShowModal() == wx.ID_OK) {
 			dirName = dlg.GetPath()
 			wx.GetApp().cfg['dirNameStorage'] = dirName
@@ -417,12 +427,11 @@ MainPanel = class(wx.Panel) {
 			this.imageViewer.UpdateContent()
 		}
 	}
-	OnBtn_PatternEdit(event:wx.CommandEvent) = {
-		dlg = PatternEditorDialog(this)
-		dlg.ShowModal()
-	}
 }
 
+//-----------------------------------------------------------------------------
+// MainFrame
+//-----------------------------------------------------------------------------
 MainFrame = class(wx.Frame) {
 	__init__(pos:wx.Point => wx.DefaultPosition) = \
 					{|nil, wx.ID_ANY, 'Getter Photo', pos, wx.Size(800, 600)|
@@ -430,8 +439,39 @@ MainFrame = class(wx.Frame) {
 		menuBar = wx.MenuBar()
 		MainPanel(this)
 		this.SetMenuBar(menuBar)
+		wx.Menu {|m|
+			menuBar.Append(m, '&Tools'$)
+			m.Append(ID_EditPattern,		'&Edit Pattern...\tCtrl-E'$)
+		}								
+		this.Bind(wx.EVT_MENU, ID_EditPattern)	{|event| this.OnMenu_EditPattern(event)}
+	}
+	OnMenu_EditPattern(event:wx.CommandEvent) = {
+		dlg = PatternEditorDialog(this)
+		dlg.ShowModal()
 	}
 }
 
+//-----------------------------------------------------------------------------
+// App
+//-----------------------------------------------------------------------------
+App = class(wx.App) {
+	public {
+		cfg
+	}
+	OnInit() = {
+		this.cfg = %{
+			'substPatFolder'	=> '${YYYY}/${YYYY}${MM}${DD} #${N}'
+			'substPatFile'		=> '${YYYY}_${MM}${DD}_${hh}${mm}${ss}${QQ}'
+		}
+		this.cfg['dirNameSource'] = '/Volumes/NO NAME'
+		this.cfg['dirNameStorage'] = '/Users/ypsitau/Pictures'
+		frame = MainFrame()
+		frame.Show()
+		true
+		//dlg = PatternEditorDialog(nil)
+		//dlg.ShowModal()
+		//false
+	}
+}
 
 wx.IMPLEMENT_APP(App)

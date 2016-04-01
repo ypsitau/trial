@@ -29,25 +29,29 @@ transDicts = %{
 <tr><td><code>${hh}</code></td><td>時を２４時間制であらわす２桁の数字</td><td><code>13</code></td></tr>
 <tr><td><code>${mm}</code></td><td>分を表す２桁の数字</td><td><code>24</code></td></tr>
 <tr><td><code>${ss}</code></td><td>秒を表す２桁の数字</td><td><code>47</code></td></tr>
+<tr><td><code>${N}</code></td><td>パス名が重ならないようにする数字</td><td><code>1</code></td></tr>
 <tr><td><code>${QQ}</code></td><td>パス名が重ならないようにする２桁のアルファベット文字</td><td><code>AA</code></td></tr>
 </table>
 </body></html>
 '''
 'Pattern Help'					=> 'パターンヘルプ'
-'Pattern Editor'				=> 'パターンエディタ'
-'Media Folder'					=> 'メディアフォルダ'
+'Edit Pattern'					=> 'パターン編集'
+'Source Folder'					=> 'コピー元フォルダ'
 'Storage Folder'				=> '格納先フォルダ'
-'Browse'						=> '選択'
+'Browse'						=> 'フォルダ選択'
 'Substitution Pattern'			=> '置換パターン'
 'Folder Name'					=> 'フォルダ名'
 'File Name'						=> 'ファイル名'
 'Edit'							=> '編集'
-'Run'							=> '実行'
-'Choose a storage folder'		=> '格納先フォルダを選択してください'
-'%d images'						=> '%d 個のイメージ'
+'Start to Copy Image Files'		=> '画像ファイルのコピー開始'
+'Choose Source Folder'			=> 'コピー元のフォルダを選択してください'
+'Choose Storage Folder'			=> '格納先フォルダを選択してください'
+'%d images'						=> '%d 個の画像'
 'Click to Fill Name'			=> 'クリックして名前を入力'
 'Result'						=> '結果'
 'Sample: '						=> 'サンプル: '
+'&Tools'						=> 'ツール (&T)'
+'&Edit Pattern...\tCtrl-E'		=> 'パターン編集 (&E)...\tCtrl-E'
 }
 }
 
