@@ -157,7 +157,7 @@ ImageViewer = class(wx.Panel) {
 		this.brushBg = wx.Brush(wx.WHITE, wx.BRUSHSTYLE_SOLID)
 		this.brushSlot = wx.Brush(wx.Colour(200, 200, 200), wx.BRUSHSTYLE_SOLID)
 		this.brushSeparator = wx.Brush(wx.Colour(240, 240, 240), wx.BRUSHSTYLE_SOLID)
-		this.containerInfos = []
+		this.containerInfosForStorage = []
 		this.timer = wx.Timer(this, TimerId)
 		this.imageInfoQue = []
 		this.font = wx.Font(11, wx.FONTFAMILY_DEFAULT, wx.FONTSTYLE_NORMAL,
@@ -178,12 +178,13 @@ ImageViewer = class(wx.Panel) {
 		this.Bind(wx.EVT_MOTION) {|event| this.OnMotion(event)}
 		this.Bind(wx.EVT_IDLE) {|event| this.OnIdle(event)}
 	}
-	UpdateContainerInfos(dirNameTop:string) = {
-		dirNames = (path.walk(dirNameTop, 1, '*'):dir).sort(`descend):list
-		this.containerInfos = dirNames.each():xlist {|dirName|
+	UpdateContainerInfosForStorage() = {
+		dirNameStorage = wx.GetApp().cfg['dirNameStorage']
+		dirNames = (path.walk(dirNameStorage, 1, '*'):dir).sort(`descend):list
+		this.containerInfosForStorage = dirNames.each():xlist {|dirName|
 			pathNames = [path.dir(dirName, '*.JPG', '*.jpg', '*.JPEG', '*.jpeg')]
 			pathNames.isempty() && continue
-			ContainerInfo(dirName.chop(), dirNameTop,
+			ContainerInfo(dirName.chop(), dirNameStorage,
 						  ImageInfo(pathNames, nil), 0, wx.Rect(0, 0, 10, 20), false)
 		}
 	}
@@ -191,7 +192,7 @@ ImageViewer = class(wx.Panel) {
 		[wdClient, htClient] = this.GetClientSizeWH()
 		y = 0
 		nCols = int((wdClient - (wdMgnLeft + wdMgnRight) + wdSkip) / (sizeThumbnail + wdSkip))
-		this.containerInfos.each {|containerInfo|
+		this.containerInfosForStorage.each {|containerInfo|
 			containerInfo.y = y
 			containerInfo.rcExpand.y = y
 			y += htSeparator
@@ -212,7 +213,7 @@ ImageViewer = class(wx.Panel) {
 		dc.Clear()
 		dc.SetPen(wx.NullPen)
 		dc.SetBrush(this.brushSlot)
-		this.containerInfos.each {|containerInfo|
+		this.containerInfosForStorage.each {|containerInfo|
 			y = containerInfo.y
 			imageInfos = containerInfo.imageInfos
 			dc.SetBrush(this.brushSeparator)
@@ -262,10 +263,10 @@ ImageViewer = class(wx.Panel) {
 	}
 	SenseBox(pt:wx.Position, clickFlag:boolean) = {
 		x = pt.x, y = pt.y + this.GetScrollPos(wx.VERTICAL)
-		idx = this.containerInfos:*rcExpand:*ContainsXY(x, y).find():index
+		idx = this.containerInfosForStorage:*rcExpand:*ContainsXY(x, y).find():index
 		if (idx) {
 			if (clickFlag) {
-				containerInfo = this.containerInfos[idx]
+				containerInfo = this.containerInfosForStorage[idx]
 				containerInfo.expandFlag = !containerInfo.expandFlag
 				if (containerInfo.expandFlag) {
 					this.imageInfoQue.append(containerInfo.imageInfos)
@@ -402,7 +403,7 @@ MainPanel = class(wx.Panel) {
 			vbox.Add(ctrl, wx.SizerFlags(1).Expand().Border(wx.TOP, 4))
 			this.imageViewer = ctrl
 		}
-		this.imageViewer.UpdateContainerInfos(wx.GetApp().cfg['dirNameStorage'])
+		this.imageViewer.UpdateContainerInfosForStorage()
 	}
 	OnBtn_SourceBrowse(event:wx.CommandEvent) = {
 		style = wx.DD_DEFAULT_STYLE | wx.DD_DIR_MUST_EXIST
@@ -411,8 +412,8 @@ MainPanel = class(wx.Panel) {
 		if (dlg.ShowModal() == wx.ID_OK) {
 			dirName = dlg.GetPath()
 			wx.GetApp().cfg['dirNameSource'] = dirName
-			this.textStorage.SetValue(dirName)
-			this.imageViewer.UpdateContainerInfos(dirName)
+			this.textSource.SetValue(dirName)
+			//this.imageViewer.UpdateContainerInfosForSource()
 			this.imageViewer.UpdateContent()
 		}
 	}
@@ -424,7 +425,7 @@ MainPanel = class(wx.Panel) {
 			dirName = dlg.GetPath()
 			wx.GetApp().cfg['dirNameStorage'] = dirName
 			this.textStorage.SetValue(dirName)
-			this.imageViewer.UpdateContainerInfos(dirName)
+			this.imageViewer.UpdateContainerInfosForStorage()
 			this.imageViewer.UpdateContent()
 		}
 	}
@@ -464,7 +465,8 @@ App = class(wx.App) {
 			'substPatFolder'	=> '${YYYY}/${YYYY}${MM}${DD} #${N}'
 			'substPatFile'		=> '${YYYY}_${MM}${DD}_${hh}${mm}${ss}${QQ}'
 		}
-		this.cfg['dirNameSource'] = '/Volumes/NO NAME'
+		//this.cfg['dirNameSource'] = '/Volumes/NO NAME'
+		this.cfg['dirNameSource'] = '/Users/ypsitau/tmp'
 		this.cfg['dirNameStorage'] = '/Users/ypsitau/Pictures'
 		frame = MainFrame()
 		frame.Show()
