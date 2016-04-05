@@ -218,16 +218,16 @@ ImageViewer = class(wx.Panel) {
 	UpdateContainerInfosForSource() = {
 		dirNameSource = wx.GetApp().cfg['dirNameSource']
 		pathNames = path.walk(dirNameSource, -1, fileNamePatternAcceptable*):file
-		this.containerInfoForSource = []
+		this.containerInfosForSource = []
 		pathNames.each():xlist {|pathName|
 			dt = GetTimeStamp(pathName)
 			!dt && continue
 			[dirName, fileName] = MakePathNameFromDatetime(dt)
-			if (idx = (this.containerInfoForSource:*dirName == dirName).find():index) {
-				containerInfo = this.containerInfoForSource[idx]
+			if (idx = (this.containerInfosForSource:*dirName == dirName).find():index) {
+				containerInfo = this.containerInfosForSource[idx]
 			} else {
 				containerInfo = ContainerInfo(dirName, [], 0, wx.Rect(0, 0, 10, 20), false)
-				this.containerInfoForSource.add(containerInfo)
+				this.containerInfosForSource.add(containerInfo)
 			}
 			containerInfo.imageInfos.add(ImageInfo(path.join(dirName, fileName), nil))
 		}
@@ -246,7 +246,7 @@ ImageViewer = class(wx.Panel) {
 		[wdClient, htClient] = this.GetClientSizeWH()
 		y = 0
 		nCols = int((wdClient - (wdMgnLeft + wdMgnRight) + wdSkip) / (sizeThumbnail + wdSkip))
-		(this.containerInfoForSource.each(),
+		(this.containerInfosForSource.each(),
 		 this.containerInfosForStorage.each()).each {|containerInfo|
 			containerInfo.y = y
 			containerInfo.rcExpand.y = y
@@ -269,7 +269,7 @@ ImageViewer = class(wx.Panel) {
 		dc.SetPen(wx.NullPen)
 		dc.SetBrush(this.brushSlot)
 		dirNameStorage = wx.GetApp().cfg['dirNameStorage']
-		(this.containerInfoForSource.each(),
+		(this.containerInfosForSource.each(),
 		 this.containerInfosForStorage.each()).each {|containerInfo|
 			y = containerInfo.y
 			imageInfos = containerInfo.imageInfos
@@ -320,19 +320,19 @@ ImageViewer = class(wx.Panel) {
 	}
 	SenseBox(pt:wx.Position, clickFlag:boolean) = {
 		x = pt.x, y = pt.y + this.GetScrollPos(wx.VERTICAL)
-		idx = this.containerInfosForStorage:*rcExpand:*ContainsXY(x, y).find():index
-		if (idx) {
-			if (clickFlag) {
-				containerInfo = this.containerInfosForStorage[idx]
-				containerInfo.expandFlag = !containerInfo.expandFlag
-				if (containerInfo.expandFlag) {
-					this.imageInfoQue.append(containerInfo.imageInfos)
+		[this.containerInfosForSource, this.containerInfosForStorage].each {|containerInfos|
+			if (idx = containerInfos:*rcExpand:*ContainsXY(x, y).find():index) {
+				if (clickFlag) {
+					containerInfo = containerInfos[idx]
+					containerInfo.expandFlag = !containerInfo.expandFlag
+					if (containerInfo.expandFlag) {
+						this.imageInfoQue.append(containerInfo.imageInfos)
+					}
 				}
+				return(`expandButton)
 			}
-			`expandButton
-		} else {
-			`none
 		}
+		`none
 	}
 	OnLeftDown(event:wx.MouseEvent) = {
 		rtn = this.SenseBox(event.GetPosition(), true)
