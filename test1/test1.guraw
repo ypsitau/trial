@@ -401,13 +401,17 @@ ImageViewer = class(wx.Panel) {
 	}
 	OnIdle(event:wx.IdleEvent) = {
 		this.imageInfoQue.isempty() && return
+		updateFlag = false
 		repeat (10) {
 			this.imageInfoQue.isempty() && break
 			imageInfo = this.imageInfoQue[0]
 			this.imageInfoQue.erase(0)
-			imageInfo.image = image(imageInfo.pathName).thumbnail(sizeThumbnail):box
+			try {
+				imageInfo.image = image(imageInfo.pathName).thumbnail(sizeThumbnail):box
+			} catch {}
+			updateFlag = true
 		}
-		this.UpdateContent()
+		updateFlag && this.UpdateContent()
 	}
 }
 
