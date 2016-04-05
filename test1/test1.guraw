@@ -262,6 +262,7 @@ ImageViewer = class(wx.Panel) {
 				height += htImages
 			}
 			height += htMgnBottom
+			containerInfo.height = height
 			y += height
 		}
 		htRequired = y
@@ -276,7 +277,7 @@ ImageViewer = class(wx.Panel) {
 		yTop = this.GetScrollPos(wx.VERTICAL)
 		yBottom = yTop + htClient
 		containerInfos.each {|containerInfo|
-			//(containerInfo.y + containerInfo.height < yTop) && continue
+			(containerInfo.y + containerInfo.height < yTop) && continue
 			(containerInfo.y >= yBottom) && break
 			y = containerInfo.y - yTop
 			imageInfos = containerInfo.imageInfos
@@ -310,6 +311,8 @@ ImageViewer = class(wx.Panel) {
 				dc.SetFont(this.font)
 				for (imageInfo in imageInfos, xSlot in xsSlot, ySlot in ysSlot) {
 					!imageInfo.image && continue
+					//(ySlot + sizeThumbnail < yTop) && continue
+					(ySlot >= yBottom) && break
 					xImage = xSlot + (sizeThumbnail - imageInfo.image.width) / 2
 					yImage = ySlot + (sizeThumbnail - imageInfo.image.height) / 2
 					dc.DrawBitmap(imageInfo.image, xImage, yImage, false)
@@ -411,7 +414,7 @@ ImageViewer = class(wx.Panel) {
 	OnIdle(event:wx.IdleEvent) = {
 		this.imageInfoQue.isempty() && return
 		updateFlag = false
-		repeat (3) {
+		repeat (1) {
 			this.imageInfoQue.isempty() && break
 			imageInfo = this.imageInfoQue[0]
 			this.imageInfoQue.erase(0)
