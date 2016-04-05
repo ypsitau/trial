@@ -138,7 +138,7 @@ ImageInfo = struct(pathName:string, image:image:nil):map
 // ContainerInfo
 //-----------------------------------------------------------------------------
 ContainerInfo = struct(dirName:string, imageInfos[]:ImageInfo,
-					   y:number, rcExpand:wx.Rect, expandFlag:boolean)
+					   y:number, height:number, rcExpand:wx.Rect, expandFlag:boolean)
 
 //-----------------------------------------------------------------------------
 // utilities
@@ -226,7 +226,7 @@ ImageViewer = class(wx.Panel) {
 			if (idx = (this.containerInfosForSource:*dirName == dirName).find():index) {
 				containerInfo = this.containerInfosForSource[idx]
 			} else {
-				containerInfo = ContainerInfo(dirName, [], 0, wx.Rect(0, 0, 10, 20), false)
+				containerInfo = ContainerInfo(dirName, [], 0, 0, wx.Rect(0, 0, 10, 20), false)
 				this.containerInfosForSource.add(containerInfo)
 			}
 			containerInfo.imageInfos.add(ImageInfo(path.join(dirName, fileName), nil))
@@ -239,39 +239,46 @@ ImageViewer = class(wx.Panel) {
 			pathNames = [path.dir(dirName, fileNamePatternAcceptable*)]
 			pathNames.isempty() && continue
 			ContainerInfo(dirName.chop(),
-						  ImageInfo(pathNames, nil), 0, wx.Rect(0, 0, 10, 20), false)
+						  ImageInfo(pathNames, nil), 0, 0, wx.Rect(0, 0, 10, 20), false)
 		}
 	}
 	UpdateContent() = {
 		[wdClient, htClient] = this.GetClientSizeWH()
 		y = 0
 		nCols = int((wdClient - (wdMgnLeft + wdMgnRight) + wdSkip) / (sizeThumbnail + wdSkip))
-		(this.containerInfosForSource.each(),
-		 this.containerInfosForStorage.each()).each {|containerInfo|
+		containerInfos = (
+				this.containerInfosForSource.each(),
+				this.containerInfosForStorage.each())
+		containerInfos.each {|containerInfo|
 			containerInfo.y = y
 			containerInfo.rcExpand.y = y
-			y += htSeparator
+			height = 0
+			height += htSeparator
 			if (containerInfo.expandFlag) {
-				y += htMgnTop
+				height += htMgnTop
 				nRows = int((containerInfo.imageInfos.len() + nCols - 1) / nCols)
 				htImages = nRows * (sizeThumbnail + htLabel)
 				if (nRows > 1) { htImages += (nRows - 1) * htSkip }
-				y += htImages
+				height += htImages
 			}
-			y += htMgnBottom
+			height += htMgnBottom
+			y += height
 		}
 		htRequired = y
 		htScreen = max(htClient, htRequired)
-		this.bmpScreen = wx.BitmapWH(wdClient, htScreen)
+		this.bmpScreen = wx.BitmapWH(wdClient, htClient)
 		dc = wx.MemoryDC(this.bmpScreen)
 		dc.SetBackground(this.brushBg)
 		dc.Clear()
 		dc.SetPen(wx.NullPen)
 		dc.SetBrush(this.brushSlot)
 		dirNameStorage = wx.GetApp().cfg['dirNameStorage']
-		(this.containerInfosForSource.each(),
-		 this.containerInfosForStorage.each()).each {|containerInfo|
-			y = containerInfo.y
+		yTop = this.GetScrollPos(wx.VERTICAL)
+		yBottom = yTop + htClient
+		containerInfos.each {|containerInfo|
+			//(containerInfo.y + containerInfo.height < yTop) && continue
+			(containerInfo.y >= yBottom) && break
+			y = containerInfo.y - yTop
 			imageInfos = containerInfo.imageInfos
 			dc.SetBrush(this.brushSeparator)
 			dc.DrawRectangle(0, y, wdClient, htSeparator)
@@ -359,8 +366,7 @@ ImageViewer = class(wx.Panel) {
 		dc = wx.PaintDC(this)
 		if (this.bmpScreen) {
 			x = this.GetScrollPos(wx.HORIZONTAL)
-			y = this.GetScrollPos(wx.VERTICAL)
-			dc.DrawBitmap(this.bmpScreen, -x, -y, false)
+			dc.DrawBitmap(this.bmpScreen, -x, 0, false)
 		}
 		dc = nil
 	}
@@ -385,7 +391,8 @@ ImageViewer = class(wx.Panel) {
 			pos = event.GetPosition()
 		}
 		this.SetScrollPos(orientation, pos)
-		this.Refresh()
+		//this.Refresh()
+		this.UpdateContent()
 	}
 	OnMouseWheel(event:wx.MouseEvent) = {
 		orientation = wx.VERTICAL
@@ -393,16 +400,18 @@ ImageViewer = class(wx.Panel) {
 		pos = this.GetScrollPos(orientation)
 		if (rot < 0) {
 			this.SetScrollPos(orientation, pos + 10)
-			this.Refresh()
+			//this.Refresh()
+			this.UpdateContent()
 		} elsif (rot > 0) {
 			this.SetScrollPos(orientation, pos - 10)
-			this.Refresh()
+			//this.Refresh()
+			this.UpdateContent()
 		}
 	}
 	OnIdle(event:wx.IdleEvent) = {
 		this.imageInfoQue.isempty() && return
 		updateFlag = false
-		repeat (10) {
+		repeat (3) {
 			this.imageInfoQue.isempty() && break
 			imageInfo = this.imageInfoQue[0]
 			this.imageInfoQue.erase(0)
