@@ -381,9 +381,9 @@ ImageViewer = class(wx.Panel) {
 		} elsif (eventType == wx.EVT_SCROLLWIN_BOTTOM.GetEventType()) {
 			pos = this.GetScrollRange(orientation)
 		} elsif (eventType == wx.EVT_SCROLLWIN_LINEUP.GetEventType()) {
-			pos = this.GetScrollPos(orientation) - 10
+			pos = this.GetScrollPos(orientation) - 50
 		} elsif (eventType == wx.EVT_SCROLLWIN_LINEDOWN.GetEventType()) {
-			pos = this.GetScrollPos(orientation) + 10
+			pos = this.GetScrollPos(orientation) + 50
 		} elsif (eventType == wx.EVT_SCROLLWIN_PAGEUP.GetEventType()) {
 			pos = this.GetScrollPos(orientation) - 100
 		} elsif (eventType == wx.EVT_SCROLLWIN_PAGEDOWN.GetEventType()) {
@@ -394,7 +394,6 @@ ImageViewer = class(wx.Panel) {
 			pos = event.GetPosition()
 		}
 		this.SetScrollPos(orientation, pos)
-		//this.Refresh()
 		this.UpdateContent()
 	}
 	OnMouseWheel(event:wx.MouseEvent) = {
@@ -402,24 +401,23 @@ ImageViewer = class(wx.Panel) {
 		rot = event.GetWheelRotation()
 		pos = this.GetScrollPos(orientation)
 		if (rot < 0) {
-			this.SetScrollPos(orientation, pos + 10)
-			//this.Refresh()
+			this.SetScrollPos(orientation, pos + 50)
 			this.UpdateContent()
 		} elsif (rot > 0) {
-			this.SetScrollPos(orientation, pos - 10)
-			//this.Refresh()
+			this.SetScrollPos(orientation, pos - 50)
 			this.UpdateContent()
 		}
 	}
 	OnIdle(event:wx.IdleEvent) = {
 		this.imageInfoQue.isempty() && return
 		updateFlag = false
-		repeat (1) {
+		repeat (3) {
 			this.imageInfoQue.isempty() && break
 			imageInfo = this.imageInfoQue[0]
 			this.imageInfoQue.erase(0)
 			try {
-				imageInfo.image = image(imageInfo.pathName).thumbnail(sizeThumbnail):box
+				//imageInfo.image = image(imageInfo.pathName).thumbnail(sizeThumbnail):box
+				imageInfo.image = image(`rgb).read@jpeg(imageInfo.pathName, sizeThumbnail)
 			} catch {}
 			updateFlag = true
 		}
