@@ -411,15 +411,17 @@ ImageViewer = class(wx.Panel) {
 	OnIdle(event:wx.IdleEvent) = {
 		this.imageInfoQue.isempty() && return
 		updateFlag = false
-		repeat (10) {
+		repeat (5) {
 			this.imageInfoQue.isempty() && break
 			imageInfo = this.imageInfoQue[0]
 			this.imageInfoQue.erase(0)
 			try {
-				//imageInfo.image = image(imageInfo.pathName).thumbnail(sizeThumbnail):box
-				imageInfo.image = image(`rgb).read@jpeg(imageInfo.pathName, sizeThumbnail):fast
-			} catch {}
-			updateFlag = true
+				imageInfo.image = image(`rgb).read@jpeg(imageInfo.pathName, sizeThumbnail):fast:rough
+			} catch {
+				// nothing to do
+			} else {
+				updateFlag = true
+			}
 		}
 		updateFlag && this.UpdateContent()
 	}
@@ -429,6 +431,7 @@ ImageViewer = class(wx.Panel) {
 // MainPanel
 //-----------------------------------------------------------------------------
 MainPanel = class(wx.Panel) {
+	TimerId = 1
 	__init__(parent:wx.Windowm) = {|parent|
 		outerBox = wx.BoxSizer(wx.VERTICAL)
 		this.SetSizer(outerBox)
@@ -474,8 +477,11 @@ MainPanel = class(wx.Panel) {
 			vbox.Add(ctrl, wx.SizerFlags(1).Expand().Border(wx.TOP, 4))
 			this.imageViewer = ctrl
 		}
+		this.timer = wx.Timer(this, TimerId)
 		this.imageViewer.UpdateContainerInfosForSource()
 		this.imageViewer.UpdateContainerInfosForStorage()
+		this.Bind(wx.EVT_TIMER, this.TimerId) {|event| this.OnTimer(event)}
+		this.timer.Start(1000, false)
 	}
 	OnBtn_SourceBrowse(event:wx.CommandEvent) = {
 		style = wx.DD_DEFAULT_STYLE | wx.DD_DIR_MUST_EXIST
@@ -500,6 +506,10 @@ MainPanel = class(wx.Panel) {
 			this.imageViewer.UpdateContainerInfosForStorage()
 			this.imageViewer.UpdateContent()
 		}
+	}
+	OnTimer(event:wx.TimerEvent) = {
+		//dirNames = path.glob('/Volumes/*/DCIM'):dir
+		//println(dirNames)
 	}
 }
 
