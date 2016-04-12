@@ -137,7 +137,7 @@ ImageInfo = struct(pathName:string, image:image:nil):map
 //-----------------------------------------------------------------------------
 // ContainerInfo
 //-----------------------------------------------------------------------------
-ContainerInfo = struct(dirName:string, imageInfos[]:ImageInfo,
+ContainerInfo = struct(type:symbol, dirName:string, imageInfos[]:ImageInfo,
 					   y:number, height:number, rcExpand:wx.Rect, expandFlag:boolean)
 
 //-----------------------------------------------------------------------------
@@ -182,17 +182,20 @@ ImageViewer = class(wx.Panel) {
 	TimerId = 1
 	sizeThumbnail = 180
 	wdSkip = 8, htSkip = 8
-	htSeparator = 20
+	htBar = 20
 	htLabel = 16
 	wdMgnLeft = 20, wdMgnRight = 4
 	htMgnTop = 4, htMgnBottom = 8
+	htScrollLine = 100
+	htScrollPage = 400
 	fileNamePatternAcceptable = ['*.JPG', '*.jpg', '*.JPEG', '*.jpeg']
 	__init__(parent:wx.Windowm, style:number) = \
 						{|parent, style => (style | wx.HSCROLL | wx.VSCROLL)|
 		this.bmpScreen = nil
 		this.brushBg = wx.Brush(wx.WHITE, wx.BRUSHSTYLE_SOLID)
 		this.brushSlot = wx.Brush(wx.Colour(200, 200, 200), wx.BRUSHSTYLE_SOLID)
-		this.brushSeparator = wx.Brush(wx.Colour(240, 240, 240), wx.BRUSHSTYLE_SOLID)
+		this.brushBarSource = wx.Brush(wx.Colour(192, 240, 192), wx.BRUSHSTYLE_SOLID)
+		this.brushBarStorage = wx.Brush(wx.Colour(240, 240, 240), wx.BRUSHSTYLE_SOLID)
 		this.containerInfosForSource = []
 		this.containerInfosForStorage = []
 		this.timer = wx.Timer(this, TimerId)
@@ -226,7 +229,8 @@ ImageViewer = class(wx.Panel) {
 			if (idx = (this.containerInfosForSource:*dirName == dirName).find():index) {
 				containerInfo = this.containerInfosForSource[idx]
 			} else {
-				containerInfo = ContainerInfo(dirName, [], 0, 0, wx.Rect(0, 0, 10, 20), false)
+				containerInfo = ContainerInfo(
+						`source, dirName, [], 0, 0, wx.Rect(0, 0, 10, 20), false)
 				this.containerInfosForSource.add(containerInfo)
 			}
 			containerInfo.imageInfos.add(ImageInfo(path.join(dirName, fileName), nil))
@@ -238,8 +242,9 @@ ImageViewer = class(wx.Panel) {
 		this.containerInfosForStorage = dirNames.each():xlist {|dirName|
 			pathNames = [path.dir(dirName, fileNamePatternAcceptable*)]
 			pathNames.isempty() && continue
-			ContainerInfo(dirName.chop(),
-						  ImageInfo(pathNames, nil), 0, 0, wx.Rect(0, 0, 10, 20), false)
+			ContainerInfo(
+					`storage, dirName.chop(),
+					ImageInfo(pathNames, nil), 0, 0, wx.Rect(0, 0, 10, 20), false)
 		}
 	}
 	UpdateContent() = {
@@ -253,7 +258,7 @@ ImageViewer = class(wx.Panel) {
 			containerInfo.y = y
 			containerInfo.rcExpand.y = y
 			height = 0
-			height += htSeparator
+			height += htBar
 			if (containerInfo.expandFlag) {
 				height += htMgnTop
 				nRows = int((containerInfo.imageInfos.len() + nCols - 1) / nCols)
@@ -281,8 +286,9 @@ ImageViewer = class(wx.Panel) {
 			(containerInfo.y >= yBottom) && break
 			y = containerInfo.y - yTop
 			imageInfos = containerInfo.imageInfos
-			dc.SetBrush(this.brushSeparator)
-			dc.DrawRectangle(0, y, wdClient, htSeparator)
+			dc.SetBrush(cond(containerInfo.type == `source,
+							 this.brushBarSource, this.brushBarStorage))
+			dc.DrawRectangle(0, y, wdClient, htBar)
 			dc.SetFont(this.fontBold)
 			dc.DrawText(cond(containerInfo.expandFlag, '-', '+'), 0, y)
 			str = containerInfo.dirName.mid(dirNameStorage.len() + 1)
@@ -303,19 +309,20 @@ ImageViewer = class(wx.Panel) {
 			[wdStr, htStr] = dc.GetTextExtent(str)
 			dc.DrawText(str, wdClient - wdStr, y)
 			if (containerInfo.expandFlag) {
-				xsSlot = wdMgnLeft + \
-					(range(imageInfos.len()) % nCols) * (sizeThumbnail + wdSkip)
-				ysSlot = y + htSeparator + htMgnTop + \
-					int(range(imageInfos.len()) / nCols) * (sizeThumbnail + htLabel + htSkip)
-				dc.DrawRectangle(xsSlot, ysSlot, sizeThumbnail, sizeThumbnail)
 				dc.SetFont(this.font)
-				for (imageInfo in imageInfos, xSlot in xsSlot, ySlot in ysSlot) {
-					!imageInfo.image && continue
-					//(ySlot + sizeThumbnail < yTop) && continue
+				dc.SetBrush(this.brushSlot)
+				imageInfos.each {|imageInfo, idx|
+					xSlot = wdMgnLeft + (idx % nCols) * (sizeThumbnail + wdSkip)
+					ySlot = y + htBar + htMgnTop + \
+						int(idx / nCols) * (sizeThumbnail + htLabel + htSkip)
+					(ySlot + sizeThumbnail <= 0) && continue
 					(ySlot >= yBottom) && break
-					xImage = xSlot + (sizeThumbnail - imageInfo.image.width) / 2
-					yImage = ySlot + (sizeThumbnail - imageInfo.image.height) / 2
-					dc.DrawBitmap(imageInfo.image, xImage, yImage, false)
+					dc.DrawRectangle(xSlot, ySlot, sizeThumbnail, sizeThumbnail)
+					if (imageInfo.image) {
+						xImage = xSlot + (sizeThumbnail - imageInfo.image.width) / 2
+						yImage = ySlot + (sizeThumbnail - imageInfo.image.height) / 2
+						dc.DrawBitmap(imageInfo.image, xImage, yImage, false)
+					}
 					str = path.filename(imageInfo.pathName)
 					[wdStr, htStr] = dc.GetTextExtent(str)
 					xStr = xSlot + (sizeThumbnail - wdStr) / 2
@@ -381,13 +388,13 @@ ImageViewer = class(wx.Panel) {
 		} elsif (eventType == wx.EVT_SCROLLWIN_BOTTOM.GetEventType()) {
 			pos = this.GetScrollRange(orientation)
 		} elsif (eventType == wx.EVT_SCROLLWIN_LINEUP.GetEventType()) {
-			pos = this.GetScrollPos(orientation) - 50
+			pos = this.GetScrollPos(orientation) - htScrollLine
 		} elsif (eventType == wx.EVT_SCROLLWIN_LINEDOWN.GetEventType()) {
-			pos = this.GetScrollPos(orientation) + 50
+			pos = this.GetScrollPos(orientation) + htScrollLine
 		} elsif (eventType == wx.EVT_SCROLLWIN_PAGEUP.GetEventType()) {
-			pos = this.GetScrollPos(orientation) - 100
+			pos = this.GetScrollPos(orientation) - htScrollPage
 		} elsif (eventType == wx.EVT_SCROLLWIN_PAGEDOWN.GetEventType()) {
-			pos = this.GetScrollPos(orientation) + 100
+			pos = this.GetScrollPos(orientation) + htScrollPage
 		} elsif (eventType == wx.EVT_SCROLLWIN_THUMBTRACK.GetEventType()) {
 			pos = event.GetPosition()
 		} elsif (eventType == wx.EVT_SCROLLWIN_THUMBRELEASE.GetEventType()) {
