@@ -1,0 +1,17 @@
+#!/usr/bin/env gura
+import(csv)
+
+computeCost(X, y, theta) = {
+	tmp = matrix.dot(X, theta) - y
+	println(tmp)
+	(tmp.transpose() * tmp) / (2 * y.rowsize())
+}
+Record = struct(x:number, y:number)
+records = Record * csv.read('ex1data1.txt')
+y = matrix(records.len(), 1)
+y.setcol(0, records:*y)
+X = matrix(records.len(), 2)
+X.setcol(0, 1)
+X.setcol(1, records:*x)
+theta = matrix(2, 1, 0)
+c = computeCost(X, y, theta)
