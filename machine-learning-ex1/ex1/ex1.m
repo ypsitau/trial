@@ -51,9 +51,11 @@ X = data(:, 1); y = data(:, 2);
 %%     [x(4)]      [y(4)]
 m = length(y); %% number of training examples
 
+[X mu sigma] = featureNormalize(X);
+
 %% Plot Data
 %% Note: You have to complete the code in plotData.m
-plotData(X, y);
+plotData(X(:, 1), y);
 
 fprintf('Program paused. Press enter to continue.\n');
 pause;
@@ -61,12 +63,12 @@ pause;
 %% =================== Part 3: Gradient descent ===================
 fprintf('Running Gradient Descent ...\n')
 
-X = [ones(m, 1), data(:, 1)]; %% Add a column of ones to x
+X = [ones(m, 1), X]; %% Add a column of ones to x
 %% X = [1  x(1)]
 %%     |1  x(2)|
 %%     |1  x(3)|
 %%     [1  x(4)]
-theta = zeros(2, 1); %% initialize fitting parameters
+theta = zeros(size(X)(2), 1); %% initialize fitting parameters
 %% theta = [0]
 %%         [0]
 
@@ -86,7 +88,8 @@ fprintf('%f %f\n', theta(1), theta(2));
 
 %% Plot the linear fit
 hold on; %% keep previous plot visible
-plot(X(:, 2), X * theta, '-')
+x = linspace(min(X(:, 2)), max(X(:, 2)))';
+plot(x, [ones(length(x), 1) x] * theta, '-');
 legend('Training data', 'Linear regression')
 hold off %% don't overlay any more plots on this figure
 
