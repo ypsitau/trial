@@ -38,6 +38,10 @@ data = load('ex1data2.txt');
 X = data(:, 1:2);
 y = data(:, 3);
 m = length(y);
+%% X = [x1(1)  x2(1)]  y = [y(1)]
+%%     |x1(2)  x2(2)|      |y(2)|
+%%     |x1(3)  x2(3)|      |y(3)|
+%%     [x1(4)  x2(4)]      [y(4)]
 
 %% Print out some data points
 fprintf('First 10 examples from the dataset: \n');
@@ -50,9 +54,17 @@ pause;
 fprintf('Normalizing Features ...\n');
 
 [X mu sigma] = featureNormalize(X);
+%% X = [x1(1)  x2(1)]  mu = [mean(x1)  mean(x2)]  sigma = [std(x1)  std(x2)]
+%%     |x1(2)  x2(2)|
+%%     |x1(3)  x2(3)|
+%%     [x1(4)  x2(4)]
 
 %% Add intercept term to X
 X = [ones(m, 1) X];
+%% X = [1  x1(1)  x2(1)]
+%%     |1  x1(2)  x2(2)|
+%%     |1  x1(3)  x2(3)|
+%%     [1  x1(4)  x2(4)]
 
 
 %%%% ================ Part 2: Gradient Descent ================
