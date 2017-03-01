@@ -39,7 +39,16 @@ pause;
 %% ======================= Part 2: Plotting =======================
 fprintf('Plotting Data ...\n')
 data = load('ex1data1.txt');
+
+%% data = [x(1) y(1)]
+%%        |x(2) y(2)|
+%%        |x(3) y(3)|
+%%        [x(4) y(4)]
 X = data(:, 1); y = data(:, 2);
+%% X = [x(1)]  y = [y(1)]
+%%     |x(2)|      |y(2)|
+%%     |x(3)|      |y(3)|
+%%     [x(4)]      [y(4)]
 m = length(y); %% number of training examples
 
 %% Plot Data
@@ -52,8 +61,14 @@ pause;
 %% =================== Part 3: Gradient descent ===================
 fprintf('Running Gradient Descent ...\n')
 
-X = [ones(m, 1), data(:,1)]; %% Add a column of ones to x
+X = [ones(m, 1), data(:, 1)]; %% Add a column of ones to x
+%% X = [1  x(1)]
+%%     |1  x(2)|
+%%     |1  x(3)|
+%%     [1  x(4)]
 theta = zeros(2, 1); %% initialize fitting parameters
+%% theta = [0]
+%%         [0]
 
 %% Some gradient descent settings
 iterations = 1500;
@@ -67,16 +82,18 @@ theta = gradientDescent(X, y, theta, alpha, iterations);
 
 %% print theta to screen
 fprintf('Theta found by gradient descent: ');
-fprintf('%f %f \n', theta(1), theta(2));
+fprintf('%f %f\n', theta(1), theta(2));
 
 %% Plot the linear fit
 hold on; %% keep previous plot visible
-plot(X(:,2), X*theta, '-')
+plot(X(:, 2), X * theta, '-')
 legend('Training data', 'Linear regression')
 hold off %% don't overlay any more plots on this figure
 
+pause;
+
 %% Predict values for population sizes of 35,000 and 70,000
-predict1 = [1, 3.5] *theta;
+predict1 = [1, 3.5] * theta;
 fprintf('For population = 35,000, we predict a profit of %f\n',...
 		predict1*10000);
 predict2 = [1, 7] * theta;

@@ -20,7 +20,7 @@ function [J, grad] = costFunction(theta, X, y)
   %% Note: grad should have the same dimensions as theta
   %%
 
-
+  
 
 
 
