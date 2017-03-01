@@ -26,6 +26,11 @@ clear ; close all; clc
 
 data = load('ex2data2.txt');
 X = data(:, [1, 2]); y = data(:, 3);
+%% X = [x1(1)  x2(1)]  y = [y(1)]  y(i) = 0 or 1
+%%     |x1(2)  x2(2)|      |y(2)|
+%%     |x1(3)  x2(3)|      |y(3)|
+%%     |x1(4)  x2(4)|      |y(4)|
+%%     [x1(5)  x2(5)]      [y(5)]
 
 plotData(X, y);
 
@@ -55,10 +60,23 @@ hold off;
 
 %% Note that mapFeature also adds a column of ones for us, so the intercept
 %% term is handled
-X = mapFeature(X(:,1), X(:,2));
+X = mapFeature(X(:, 1), X(:, 2));
+
+%% X = [1  x1(1)  x2(1)  x3(1) ... x28(1)]
+%%     |1  x1(2)  x2(2)  x3(2) ... x28(2)|
+%%     |1  x1(3)  x2(3)  x3(3) ... x28(3)|
+%%     |1  x1(4)  x2(4)  x3(4) ... x28(4)|
+%%     [1  x1(5)  x2(5)  x3(5) ... x28(5)]
 
 %% Initialize fitting parameters
 initial_theta = zeros(size(X, 2), 1);
+
+%% initial_theta = [t0 ]
+%%                 |t1 |
+%%                 |t2 |
+%%                 |t3 |
+%%                   :
+%%                 [t28]
 
 %% Set regularization parameter lambda to 1
 lambda = 1;
