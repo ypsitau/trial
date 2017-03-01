@@ -4,10 +4,15 @@ function p = predict(theta, X)
   %%   p = PREDICT(theta, X) computes the predictions for X using a 
   %%   threshold at 0.5 (i.e., if sigmoid(theta'*x) >= 0.5, predict 1)
 
-  m = size(X, 1); %% Number of training examples
+  %% X = [1  x1(1)  x2(1)]
+  %%     |1  x1(2)  x2(2)|
+  %%     |1  x1(3)  x2(3)|
+  %%     |1  x1(4)  x2(4)|
+  %%     [1  x1(5)  x2(5)]
 
-  %% You need to return the following variables correctly
-  p = zeros(m, 1);
+  %% theta = [t0]
+  %%         |t1]
+  %%         [t2]
 
   %% ====================== YOUR CODE HERE ======================
   %% Instructions: Complete the following code to make predictions using
@@ -15,11 +20,7 @@ function p = predict(theta, X)
   %%               You should set p to a vector of 0's and 1's
   %%
 
-
-
-
-
-
+  p = (X * theta) >= 0;
 
   %% =========================================================================
 
