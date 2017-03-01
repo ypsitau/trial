@@ -4,12 +4,18 @@ function [J, grad] = costFunction(theta, X, y)
   %%   parameter for logistic regression and the gradient of the cost
   %%   w.r.t. to the parameters.
 
+  %% X = [1  x1(1)  x2(1)]  y = [y(1)]  y(i) = 0 or 1
+  %%     |1  x1(2)  x2(2)|      |y(2)|
+  %%     |1  x1(3)  x2(3)|      |y(3)|
+  %%     |1  x1(4)  x2(4)|      |y(4)|
+  %%     [1  x1(5)  x2(5)]      [y(5)]
+
+  %% theta = [t0]
+  %%         |t1]
+  %%         [t2]
+
   %% Initialize some useful values
   m = length(y); %% number of training examples
-
-  %% You need to return the following variables correctly 
-  J = 0;
-  grad = zeros(size(theta));
 
   %% ====================== YOUR CODE HERE ======================
   %% Instructions: Compute the cost of a particular choice of theta.
@@ -20,12 +26,18 @@ function [J, grad] = costFunction(theta, X, y)
   %% Note: grad should have the same dimensions as theta
   %%
 
-  
+  h = sigmoid(X * theta);
+  %% h = [h(1)]
+  %%     |h(2)|
+  %%     |h(3)|
+  %%     |h(4)|
+  %%     [h(5)]
 
-
-
-
-
+  J = (-y' * log(h) - (1 - y)' * log(1 - h)) / m;
+  grad = ((h - y)' * X / m)';
+  %% grad = [g0]
+  %%        |g1|
+  %%        [g2]
 
   %% =============================================================
 

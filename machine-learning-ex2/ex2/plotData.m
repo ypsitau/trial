@@ -6,6 +6,12 @@ function plotData(X, y)
   %% Create New Figure
   figure; hold on;
 
+  %% X = [x1(1)  x2(1)]  y = [y(1)]  y(i) = 0 or 1
+  %%     |x1(2)  x2(2)|      |y(2)|
+  %%     |x1(3)  x2(3)|      |y(3)|
+  %%     |x1(4)  x2(4)|      |y(4)|
+  %%     [x1(5)  x2(5)]      [y(5)]
+
   %% ====================== YOUR CODE HERE ======================
   %% Instructions: Plot the positive and negative examples on a
   %%               2D plot, using the option 'k+' for the positive
@@ -20,8 +26,6 @@ function plotData(X, y)
 	   'MarkerFaceColor', 'y')
 
   %% =========================================================================
-
-
 
   hold off;
 

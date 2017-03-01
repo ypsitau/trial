@@ -25,6 +25,11 @@ clear ; close all; clc
 
 data = load('ex2data1.txt');
 X = data(:, [1, 2]); y = data(:, 3);
+%% X = [x1(1)  x2(1)]  y = [y(1)]  y(i) = 0 or 1
+%%     |x1(2)  x2(2)|      |y(2)|
+%%     |x1(3)  x2(3)|      |y(3)|
+%%     |x1(4)  x2(4)|      |y(4)|
+%%     [x1(5)  x2(5)]      [y(5)]
 
 %% ==================== Part 1: Plotting ====================
 %%  We start the exercise by first plotting the data to understand the 
@@ -59,9 +64,17 @@ pause;
 
 %% Add intercept term to x and X_test
 X = [ones(m, 1) X];
+%% X = [1  x1(1)  x2(1)]
+%%     |1  x1(2)  x2(2)|
+%%     |1  x1(3)  x2(3)|
+%%     |1  x1(4)  x2(4)|
+%%     [1  x1(5)  x2(5)]
 
 %% Initialize fitting parameters
 initial_theta = zeros(n + 1, 1);
+%% intial_theta = [t0]
+%%                |t1]
+%%                [t2]
 
 %% Compute and display initial cost and gradient
 [cost, grad] = costFunction(initial_theta, X, y);
