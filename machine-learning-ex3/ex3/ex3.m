@@ -35,6 +35,18 @@ fprintf('Loading and Visualizing Data ...\n')
 load('ex3data1.mat'); %% training data stored in arrays X, y
 m = size(X, 1);
 
+%% X = [x1(1)     x2(1)     x3(1)    ... x400(1)   ]
+%%     |x1(2)     x2(2)     x3(2)    ... x400(2)   |
+%%     |x1(3)     x2(3)     x3(3)    ... x400(3)   |
+%%                          :
+%%     [x1(5000)  x2(5000)  x3(5000) ... x400(5000)]
+%%
+%% y = [y(1)   ]
+%%     |y(2)   |
+%%     |y(3)   |
+%%       :
+%%     [y(5000)]
+
 %% Randomly select 100 data points to display
 rand_indices = randperm(m);
 sel = X(rand_indices(1:100), :);
@@ -58,6 +70,24 @@ fprintf('\nTesting lrCostFunction()');
 theta_t = [-2; -1; 1; 2];
 X_t = [ones(5,1) reshape(1:15,5,3)/10];
 y_t = ([1;0;1;0;1] >= 0.5);
+
+%% theta_t = [-2]
+%%           |-1|
+%%           | 1|
+%%           [ 2]
+
+%% X_t = [1  0.1  0.6  1.1]
+%%       |1  0.2  0.7  1.2|
+%%       |1  0.3  0.8  1.3|
+%%       |1  0.4  0.9  1.4|
+%%       |1  0.5  1.0  1.5|
+
+%% y_t = [1]
+%%       |0|
+%%       |1|
+%%       |0|
+%%       [1]
+
 lambda_t = 3;
 [J grad] = lrCostFunction(theta_t, X_t, y_t, lambda_t);
 
