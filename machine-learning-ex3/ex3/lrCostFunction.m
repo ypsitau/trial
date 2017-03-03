@@ -53,7 +53,7 @@ function [J, grad] = lrCostFunction(theta, X, y, lambda)
   h = sigmoid(X * theta);
 
   J = sum(-y .* log(h) - (1 - y) .* log(1 - h)) / m;
-  J = J + lambda * sum(theta_t .* theta_t) / (2 * m);
+  J = J + lambda * sum(theta_t .^ 2) / (2 * m);
 
   %% =============================================================
 
