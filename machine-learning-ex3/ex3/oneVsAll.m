@@ -14,9 +14,21 @@ function [all_theta] = oneVsAll(X, y, num_labels, lambda)
   %% You need to return the following variables correctly 
   all_theta = zeros(num_labels, n + 1);
 
+  %% all_theta = [t1,0   t1,1   t1,2   t1,3   ... t1,400 ]  .. one
+  %%             |t2,0   t2,1   t2,2   t2,3   ... t2,400 |  .. two
+  %%             |t3,0   t3,1   t3,2   t3,3   ... t3,400 |  .. three
+  %%                               :
+  %%             [t10,0  t10,1  t10,2  t10,3  ... t10,400]  .. zero
+
   %% Add ones to the X data matrix
   X = [ones(m, 1) X];
 
+  %% X = [1  x1(1)     x2(1)     x3(1)    ... x400(1)   ]
+  %%     |1  x1(2)     x2(2)     x3(2)    ... x400(2)   |
+  %%     |1  x1(3)     x2(3)     x3(3)    ... x400(3)   |
+  %%                            :
+  %%     [1  x1(5000)  x2(5000)  x3(5000) ... x400(5000)]
+  
   %% ====================== YOUR CODE HERE ======================
   %% Instructions: You should complete the following code to train num_labels
   %%               logistic regression classifiers with regularization
@@ -49,17 +61,14 @@ function [all_theta] = oneVsAll(X, y, num_labels, lambda)
   %%                 initial_theta, options);
   %%
 
-
-
-
-
-
-
-
-
-
-
-
+  options = optimset('GradObj', 'on', 'MaxIter', 50);
+  initial_theta = zeros(n + 1, 1);
+  
+  for c = 1:num_labels
+	[all_theta(c, :)] = fmincg (@(t)(lrCostFunction(t, X, (y == c), lambda)),
+								initial_theta, options);
+  end
+  
   %% =========================================================================
 
 
