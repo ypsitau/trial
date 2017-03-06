@@ -48,7 +48,13 @@ function p = predictOneVsAll(all_theta, X)
   %%       for each row.
   %%       
 
-  [n, p] = max(X * all_theta', [], 2)
+  [tmp, p] = max(X * all_theta', [], 2);
+
+  %% p = [p(1)   ]
+  %%     |p(2)   |
+  %%     |p(3)   |
+  %%         ;
+  %%     |p(5000)|
 
   %% =========================================================================
 
