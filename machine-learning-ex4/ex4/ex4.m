@@ -33,6 +33,19 @@ num_labels = 10;          %% 10 labels, from 1 to 10
 fprintf('Loading and Visualizing Data ...\n')
 
 load('ex4data1.mat');
+
+%% X = [x1(1)     x2(1)     x3(1)     ..  x400(1)   ]
+%%     |x1(2)     x2(2)     x3(2)     ..  x400(2)   |
+%%     |x1(3)     x2(3)     x3(3)     ..  x400(3)   |
+%%                           :
+%%     [x1(5000)  x2(5000)  x3(5000)  ..  x400(5000)]
+
+%% y = [y(1)   ]   y(n) = 1..10
+%%     |y(2)   |
+%%     |y(3)   |
+%%         :
+%%     [y(5000)]
+
 m = size(X, 1);
 
 %% Randomly select 100 data points to display
@@ -54,8 +67,31 @@ fprintf('\nLoading Saved Neural Network Parameters ...\n')
 %% Load the weights into variables Theta1 and Theta2
 load('ex4weights.mat');
 
+%% Theta1 = [t1,0(1)   t1,1(1)   t1,2(1)   ..   t1,400(1) ]
+%%          |t2,0(1)   t2,1(1)   t2,2(1)   ..   t2,400(1) |
+%%          |t3,0(1)   t3,1(1)   t3,2(1)   ..   t3,400(1) |
+%%                              :
+%%          [t25,1(1)  t25,2(1)  t25,3(1)  ..   t25,400(1)]
+
+%% Theta2 = [t1,0(2)   t1,1(2)   t1,2(2)   ..   t1,25(2) ]
+%%          |t2,0(2)   t2,1(2)   t2,2(2)   ..   t2,25(2) |
+%%          |t3,0(2)   t3,1(2)   t3,3(2)   ..   t3,25(2) |
+%%                              :
+%%          [t10,1(2)  t10,2(2)  t10,3(2)  ..   t10,25(2)]
+
 %% Unroll parameters 
 nn_params = [Theta1(:) ; Theta2(:)];
+
+%% nn_params = [t1,1(1)   ]
+%%             |t2,1(1)   |
+%%             |t3,1(1)   |
+%%                   : 
+%%             |t25,401(1)|
+%%             |t1,1(2)   |
+%%             |t2,1(2)   |
+%%             |t3,1(2)   |
+%%                   : 
+%%             |t10,26(2) |
 
 %% ================ Part 3: Compute Cost (Feedforward) ================
 %%  To the neural network, you should first start by implementing the
