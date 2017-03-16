@@ -96,12 +96,19 @@ function [J grad] = nnCostFunction(nn_params, ...
 	z_3 = Theta2 * a_2;
 	h = a_3 = sigmoid(z_3);
 	J = J + sum(- y_t .* log(h) - (1 - y_t) .* log(1 - h));
-	d_3 = a_3 - y_t;
+	delta_3 = a_3 - y_t;
+	delta_2 = Theta2' * delta_3 .* [1; sigmoidGradient(z_2)];
+	delta_2 = delta_2(2 : end);
+	Theta1_grad = Theta1_grad + delta_2 * a_1';
+	Theta2_grad = Theta2_grad + delta_3 * a_2';
   end
   J = J / m;
 
   J = J + lambda * (sum(Theta1(size(Theta1, 1) + 1 : end) .^ 2) +
   					sum(Theta2(size(Theta2, 1) + 1 : end) .^ 2)) / (2 * m);
+
+  Theta1_grad = Theta1_grad / m;
+  Theta2_grad = Theta2_grad / m;
 
   %% -------------------------------------------------------------
 
