@@ -88,12 +88,15 @@ function [J grad] = nnCostFunction(nn_params, ...
   
   J = 0;
   Y = eye(num_labels);
-  for i = 1 : m
-	x_i = X(i, :)';
-	y_i = Y(:, y(i));
-	h = sigmoid(Theta1 * [1; x_i]);
-	h = sigmoid(Theta2 * [1; h]);
-	J = J + sum(- y_i .* log(h) - (1 - y_i) .* log(1 - h));
+  for t = 1 : m
+	x_t = X(t, :)';
+	y_t = Y(:, y(t));
+	a_1 = [1; x_t];
+	z_2 = Theta1 * a_1;
+	a_2 = [1; sigmoid(z_2)];
+	z_3 = Theta2 * a_2;
+	h = a_3 = sigmoid(z_3);
+	J = J + sum(- y_t .* log(h) - (1 - y_t) .* log(1 - h));
   end
   J = J / m;
 
