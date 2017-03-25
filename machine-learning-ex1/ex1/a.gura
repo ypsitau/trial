@@ -1,18 +1,32 @@
 #!/usr/bin/env gura
 import(csv)
 
-computeCost(X:array, y:array, weight:number, bias:number) = {
-	h = X * weight + bias
+computeCost(X:array, y:array, weight:array, bias:number) = {
+	// X = [[x1(1), x2(1), x3(1)]   y = [[y(1)]   weight = [[w1]
+	//      [x1(2), x2(2), x3(2)]        [y(2)]             [w2]
+	//      [x1(3), x2(3), x3(3)]        [y(3)]             [w3]]
+	//      [x1(4), x2(4), x3(4)]        [y(4)]
+	//      [x1(5), x2(5), x3(5)]]       [y(4)]]
+	h = X |.| weight + bias
 	((h - y) ** 2).sum() / (2 * X.shape[0])
 }
-gradientDescent(X:array, y:array, weight:number, bias:number, alpha:number, num_iters:number) = {
+
+gradientDescent(X:array, y:array, weight:array, bias:number, alpha:number, num_iters:number) = {
+	m = y.shape[0]
 	repeat (num_iters) {
-		
+		h = X |.| weight + bias
+		weight -= alpha * (h - y).T |.| X / m
+		bias -= alpha * (h - y).average()
 	}
+	[weight, bias]
 }
+
 Record = struct(x:number, y:number)
 data = Record * csv.read('ex1data1.txt')
-X = array(data:*x), y = array(data:*y)
-weight = 0, bias = 0
+X = array(data::x).reshape([nil, 1]), y = array(data::y).reshape([nil, 1])
+weight = array {{0}}, bias = 0
 println(computeCost(X, y, weight, bias))
-//println(((h - y) ** 2).sum() / (2 * X.shape[0]))
+alpha = .01
+num_iters = 1500
+[weight, bias] = gradientDescent(X, y, weight, bias, alpha, num_iters)
+println(weight, ' ', bias)
