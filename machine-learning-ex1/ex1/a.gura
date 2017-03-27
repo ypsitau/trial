@@ -15,7 +15,7 @@ gradientDescent(X:array, y:array, weight:array, bias:number, alpha:number, num_i
 	m = y.shape[0]
 	repeat (num_iters) {
 		h = X |.| weight + bias
-		weight -= alpha * (h - y).T |.| X / m
+		weight -= (alpha * (h - y).T |.| X / m).T
 		bias -= alpha * (h - y).average()
 	}
 	[weight, bias]
@@ -23,7 +23,10 @@ gradientDescent(X:array, y:array, weight:array, bias:number, alpha:number, num_i
 
 Record = struct(x:number, y:number)
 data = Record * csv.read('ex1data1.txt')
-X = array(data::x).reshape([nil, 1]), y = array(data::y).reshape([nil, 1])
+x = data::x
+mu = x.average(), sigma = x.stddev()
+X = array((x - mu) / sigma).reshape([nil, 1])
+y = array(data::y).reshape([nil, 1])
 weight = array {{0}}, bias = 0
 println(computeCost(X, y, weight, bias))
 alpha = .01
