@@ -16,21 +16,20 @@ gradientDescent(X:array, y:array, theta:array, alpha:number, num_iters:number) =
 	m = y.shape[0]
 	repeat (num_iters) {
 		h = X |.| theta;
-		println(X.T)
-		println(h - y)
-		conio.waitkey():raise
 		theta = theta - alpha * (X.T |.| (h - y)) / m;
 	}
+	theta
 }
 
 Record = struct(x:number, y:number)
 data = Record * csv.read('ex1data1.txt')
 x = data::x
-X = array {consts(1, x.len()):list, x}.T
+mu = x.average(), sigma = x.stddev()
+X = array {consts(1, x.len()):list, (x - mu) / sigma}.T
 y = array(data::y).reshape([nil, 1])
 theta = array.zeros([X.shape[1], 1])
 println(computeCost(X, y, theta))
 alpha = .01
 num_iters = 1500
-[theta] = gradientDescent(X, y, theta, alpha, num_iters)
+theta = gradientDescent(X, y, theta, alpha, num_iters)
 println(theta)

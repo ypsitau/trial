@@ -27,7 +27,7 @@ x = data::x
 mu = x.average(), sigma = x.stddev()
 X = array((x - mu) / sigma).reshape([nil, 1])
 y = array(data::y).reshape([nil, 1])
-weight = array {{0}}, bias = 0
+weight = array.zeros([X.shape[1], 1]), bias = 0
 println(computeCost(X, y, weight, bias))
 alpha = .01
 num_iters = 1500
