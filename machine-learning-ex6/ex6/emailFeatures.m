@@ -48,12 +48,9 @@ function x = emailFeatures(word_indices)
   %%
   %%
 
-
-
-
-
-
-
+  for idx = word_indices
+	x(idx) = 1;
+  end
 
   %% =========================================================================
   
