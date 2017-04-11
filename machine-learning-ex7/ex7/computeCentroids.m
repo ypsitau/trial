@@ -26,12 +26,10 @@ function centroids = computeCentroids(X, idx, K)
   %% Note: You can use a for-loop over the centroids to compute this.
   %%
 
-
-
-
-
-
-
+  for i = 1 : K
+	x = X(find(idx == i), :);
+	centroids(i, :) = sum(x) / size(x, 1);
+  end
 
   %% =============================================================
 
