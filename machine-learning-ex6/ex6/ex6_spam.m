@@ -72,6 +72,7 @@ fprintf('(this may take 1 to 2 minutes) ...\n')
 
 C = 0.1;
 model = svmTrain(X, y, C, @linearKernel);
+save 'model.mat' model;
 
 p = svmPredict(model, X);
 
