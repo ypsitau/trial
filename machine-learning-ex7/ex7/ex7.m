@@ -21,6 +21,8 @@
 %% Initialization
 clear ; close all; clc
 
+warning("off", "Octave:broadcast");
+
 %% ================= Part 1: Find Closest Centroids ====================
 %%  To help you implement K-Means, we have divided the learning algorithm 
 %%  into two functions -- findClosestCentroids and computeCentroids. In this
