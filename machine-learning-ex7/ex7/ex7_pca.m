@@ -21,6 +21,8 @@
 %% Initialization
 clear ; close all; clc
 
+warning("off", "Octave:broadcast");
+
 %% ================== Part 1: Load Example Dataset  ===================
 %%  We start this exercise by using a small dataset that is easily to
 %%  visualize
