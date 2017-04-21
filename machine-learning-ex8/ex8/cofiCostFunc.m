@@ -40,20 +40,12 @@ function [J, grad] = cofiCostFunc(params, Y, R, num_users, num_movies, ...
   %%                     partial derivatives w.r.t. to each element of Theta
   %%
 
+  err = (X * Theta' - Y) .* R; %% num_movies x num_users
 
+  J = sum(sum((err .^ 2))) / 2;
 
-
-
-
-
-
-
-
-
-
-
-
-
+  X_grad = err * Theta;
+  Theta_grad = err' * X;
 
   %% =============================================================
 
