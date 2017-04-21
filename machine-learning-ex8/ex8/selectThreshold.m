@@ -24,9 +24,9 @@ function [bestEpsilon bestF1] = selectThreshold(yval, pval)
     %%       of 0's and 1's of the outlier predictions
 
 	predictions = (pval < epsilon);
-	tp = sum((predictions == 1) & (yval = 1));
-	fp = sum((predictions == 1) & (yval = 0));
-	fn = sum((predictions == 0) & (yval = 0));
+	tp = sum((predictions == 1) & (yval == 1));
+	fp = sum((predictions == 1) & (yval == 0));
+	fn = sum((predictions == 0) & (yval == 1));
 
 	prec = tp / (tp + fp);
 	rec = tp / (tp + fn);
