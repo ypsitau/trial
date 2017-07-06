@@ -1,6 +1,7 @@
 #!/usr/bin/env gura
 import(csv)
 import(conio)
+import(arrayutil)
 
 computeCost(X:array, y:array, theta:array) = {
 	// X = [[1  x1(1), x2(1), x3(1)]   y = [[y(1)]   theta = [[t0]
@@ -24,10 +25,23 @@ gradientDescent(X:array, y:array, theta:array, alpha:number, num_iters:number) =
 Record = struct(x:number, y:number)
 data = Record * csv.read('ex1data1.txt')
 x = data::x
-mu = x.average(), sigma = x.stddev()
+mu = x.mean(), sigma = x.stddev()
 X = array {consts(1, x.len()):list, (x - mu) / sigma}.T
 y = array(data::y).reshape([nil, 1])
 theta = array.zeros([X.shape[1], 1])
+/*
+data = array.read@csv('ex1data1.txt')
+//println(data)
+len = data.shape[0]
+X = array.ones([len, 2])
+x = data[*, 0]
+X[*, 1] = x
+y = data[*, 1].reshape([nil, 1])
+theta = array.zeros([data.shape[1], 1])
+*/
+//println(X)
+//println(y)
+
 println(computeCost(X, y, theta))
 alpha = .01
 num_iters = 1500
