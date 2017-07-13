@@ -25,8 +25,8 @@ gradientDescent(X:array, y:array, theta:array, alpha:number, num_iters:number) =
 data = array.read@csv('ex1data1.txt')
 len = data.shape[0]
 X = array.ones([len, 2])
-x = data[*, 0]
-X[*, 1] = (x - x.mean()) / x.std()
+x = data[*, 0].reshape([nil, 1])
+X[*, 1] = (x - x.mean(0)) / x.std(0)
 y = data[*, 1].reshape([nil, 1])
 theta = array.zeros([data.shape[1], 1])
 println(computeCost(X, y, theta))
