@@ -1,0 +1,47 @@
+#!/usr/bin/env gura
+import(csv)
+import(conio)
+import(arrayutil)
+
+costFunction(theta:array, X:array, y:array) = {
+	// X = [[1  x1(1), x2(1), x3(1)]   y = [[y(1)]  y(i) = 0 or 1  theta = [[t0]
+	//      [1  x1(2), x2(2), x3(2)]        [y(2)]                          [t1]
+	//      [1  x1(3), x2(3), x3(3)]        [y(3)]                          [t2]
+	//      [1  x1(4), x2(4), x3(4)]        [y(4)]                          [t3]]
+	//      [1  x1(5), x2(5), x3(5)]]       [y(4)]]
+	h = math.sigmoid(X |.| theta)
+	// h = [h(1)]
+	//     |h(2)|
+	//     |h(3)|
+	//     |h(4)|
+	//     |h(5)]
+	m = X.shape[0]
+	cost = (-y.T |.| math.log(h) - (1 - y).T |.| math.log(1 - h)) / m
+	grad = ((h - y).T |.| X / m).T
+	// grad = [g0]
+	//        |g1|
+	//        [g2]
+	[cost, grad]
+}
+
+data = array.read@csv('ex2data1.txt')
+x = data[*, [0, 1]]
+y = data[*, 2].reshape([nil, 1])
+X = array.ones([x.shape[0], 3])
+//X[*, [1, 2]] = (x - x.mean(0)) / x.std(0)
+X[*, [1, 2]] = x
+theta = array.zeros([X.shape[1], 1])
+[cost, grad] = costFunction(theta, X, y);
+println(cost)
+println(grad)
+test_theta = array {-24, 0.2, 0.2}.reshape([nil, 1])
+[cost, grad] = costFunction(test_theta, X, y);
+println(cost)
+println(grad)
+/*
+println(computeCost(X, y, theta))
+alpha = .01
+num_iters = 1500
+theta = gradientDescent(X, y, theta, alpha, num_iters)
+println(theta)
+*/
