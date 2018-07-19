@@ -1,4 +1,2 @@
-.cpp.o:
-	gcc -c $<
-
-test: test.o
+test.s: test.cpp
+	gcc -S -O2 $<
