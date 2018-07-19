@@ -1,17 +1,24 @@
 <!doctype html>
-<html lang="{{ lang }}">
+<html lang="{{ page.lang }}">
   <head>
     <!-- Required meta tags -->
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.2/css/bootstrap.min.css" integrity="sha384-Smlep5jCw/wG7hdkwQ/Z5nLIefveQRIY9nfy6xoR1uRYBtpZgI6339F5dgvm/e9B" crossorigin="anonymous">
-    <link href="../css/gura-template.css" rel="stylesheet">
-    <title>{{ title }}</title>
+    <link href="{{ page.topdir }}/css/gura-template.css" rel="stylesheet">
+    <title>{{ page.title }}</title>
   </head>
   <body>
-    <div class="container">
-	  {{ content }}
+    <div class="container-fluid">
+	  <div class="row">
+		<div class="col-sm-2">
+		  {% include {{ page.navi }}.html %}
+		</div>
+		<div class="col-sm-10">
+		  {{ content }}
+		</div>
+	  </div>
 	</div>
     <!-- Optional JavaScript -->
     <!-- jQuery first, then Popper.js, then Bootstrap JS -->
