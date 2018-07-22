@@ -3,46 +3,28 @@ layout: basement
 topdir: ../..
 ---
 <!-- <nav class="navbar navbar-light bg-light"> -->
-<ul class="bg-light nav nav-tabs">
-  <!--
-	  <a class="logo" href="{{ topdir }}/index.html">
-		<img src="{{ topdir }}/assets/banner-medium.png" alt="Gura Programming Language" />
-	  </a>
-	  -->
-  <li class="nav-item">
-	<a class="nav-link{% if page.url == '/' %} active{% endif %}" href="/">Top</a>
-  </li>
-  <li class="nav-item">
-	<a class="nav-link{% if page.url contains '/document/' %} active{% endif %}" href="/document/">Document</a>
-  </li>
-  <li class="nav-item">
-	<a class="nav-link{% if page.url contains '/download/' %} active{% endif %}" href="/download/">Download</a>
-  </li>
-  <li class="nav-item">
-	<a class="nav-link{% if page.url contains '/gallery/' %} active{% endif %}" href="/gallery/">Gallery</a>
-  </li>
-</ul>
-<div class="container-fluid">
-  <div class="row">
-    <nav class="col-md-2 col-md-2 hidden-xs-down bg-faded sidebar">
-      <ul class="nav nav-pills flex-column">
-        <li class="nav-item">
-          <a class="nav-link active" href="#">Top <span class="sr-only">(current)</span></a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" href="#">Document</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" href="#">Download</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" href="#">Gallery</a>
-        </li>
-      </ul>
-	</nav>
-	<!-- class="col-sm-9 offset-sm-3 col-md-10 offset-md-2 pt-3"> -->
-    <div class="col-sm-10 pt-3">
-	  {{ content }}
-	</div>
-  </div>
+<!--
+	<a class="logo" href="{{ topdir }}/index.html">
+	  <img src="{{ topdir }}/assets/banner-medium.png" alt="Gura Programming Language" />
+	</a>
+-->
+<nav class="navbar navbar-inverse navbar-fixed-left">
+  <ul class="nav nav-pills flex-column">
+    <li class="nav-item">
+      <a class="nav-link{% if page.url == '/' %} active{% endif %}" href="/">Top</span></a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link{% if page.url contains '/document/' %} active{% endif %}" href="/document/">Document</a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link{% if page.url contains '/download/' %} active{% endif %}" href="/download/">Download</a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link{% if page.url contains '/gallery/' %} active{% endif %}" href="/gallery/">Gallery</a>
+    </li>
+  </ul>
+</nav>
+<div class="container">
+  {{ content }}
+</div>
 </div>
