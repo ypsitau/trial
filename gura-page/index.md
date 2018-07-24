@@ -38,46 +38,7 @@ title: top
 	  </div>
 	</div>
   </div>
-  <div class="row">
-    <nav class="col-md-2 col-md-2 hidden-xs-down bg-faded sidebar">
-      <ul class="nav nav-pills flex-column">
-        <li class="nav-item">
-          <a class="nav-link active" href="#">Top <span class="sr-only">(current)</span></a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" href="#">Document</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" href="#">Download</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" href="#">Gallery</a>
-        </li>
-      </ul>
-	</nav>
-	<!-- class="col-sm-9 offset-sm-3 col-md-10 offset-md-2 pt-3"> -->
-    <div class="col-sm-10 pt-3">
-	{% for i in (0..100) %}
-	  hello {{ i }}
-	{% endfor %}
-	</div>
-  </div>
 </div>
-
-<ul class="nav nav-tabs">
-  <li class="nav-item">
-    <a class="nav-link active" href="#">Active</a>
-  </li>
-  <li class="nav-item">
-    <a class="nav-link" href="#">Link</a>
-  </li>
-  <li class="nav-item">
-    <a class="nav-link" href="#">Link</a>
-  </li>
-  <li class="nav-item">
-    <a class="nav-link disabled" href="#">Disabled</a>
-  </li>
-</ul>
 
 <nav aria-label="breadcrumb">
   <ol class="breadcrumb">
