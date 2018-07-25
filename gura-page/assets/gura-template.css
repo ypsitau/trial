@@ -1,28 +1,64 @@
 /* settings for scrollable and fix-positioned side bar */
 .sidebar {
 	position: fixed;
-	top: 0px;
-	bottom: 0px;
-	left: 0px;
-	z-index: 1000;
+	top: 0;
+	bottom: 0;
+	left: 0;
 	overflow-x: hidden;
 	overflow-y: auto;
 }
 
 .sidebar {
 	border-right: 1px solid #eee;
-	padding-left: 4px;
-	padding-right: 4px;
+	z-index: 100;		/* Behind the navbar */
+	padding: 56px 0 0;	/* Height of navbar */
+}
+
+.feather {
+	width: 16px;
+	height: 16px;
+	vertical-align: text-bottom;
 }
 
 body {
-	padding-top: 56px;
+	padding-top: 56px;	/* Height of navbar */
 }
 
 pre {
 	padding: 1em;
 	font-size: 14px;
 	border: #ccccee 1px solid;
+}
+
+/* settings for list items in sidebar */
+.list-group.list-group-root {
+  padding: 0;
+  overflow: hidden;
+}
+
+.list-group.list-group-root .list-group {
+  margin-bottom: 0;
+}
+
+.list-group.list-group-root .list-group-item {
+  border-radius: 0;
+  border-width: 1px 0 0 0;
+}
+
+.list-group.list-group-root > .list-group-item:first-child {
+  border-top-width: 0;
+}
+
+.list-group.list-group-root > .list-group > .list-group-item {
+  padding-left: 30px;
+}
+
+.list-group.list-group-root > .list-group > .list-group > .list-group-item {
+  padding-left: 45px;
+}
+
+.list-group-item .glyphicon {
+  margin-right: 5px;
 }
 
 /* settings for syntax highlighting */

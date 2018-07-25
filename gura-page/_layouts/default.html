@@ -7,6 +7,52 @@ topdir: ../..
 	  <img src="{{ topdir }}/assets/banner-medium.png" alt="Gura Programming Language" />
 	</a>
 -->
-<div class="container">
-  {{ content }}
+<div class="container-fluid">
+  <div class="row">
+    <nav class="col-md-2 d-none d-md-block bg-light sidebar">
+	  <ul class="nav flex-column">
+        <li class="nav-item">
+          <a class="nav-link active" href="#">
+            <span data-feather="plus-circle"></span>
+            Dashboard <span class="sr-only">(current)</span>
+          </a>
+		  <ul class="nav flex-column">
+			<li class="nav-item">
+			  <a class="nav-link" href="#">
+				<span data-feather="file"></span>
+				1.1
+			  </a>
+			</li>
+			<li class="nav-item">
+			  <a class="nav-link" href="#">
+				<span data-feather="file"></span>
+				1.2
+			  </a>
+			</li>
+			<li class="nav-item">
+			  <a class="nav-link" href="#">
+				<span data-feather="file"></span>
+				1.3
+			  </a>
+			</li>
+			<li class="nav-item">
+			  <a class="nav-link" href="#">
+				<span data-feather="file"></span>
+				1.4
+			  </a>
+			</li>
+		  </ul>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="#">
+            <span data-feather="file"></span>
+            Orders
+          </a>
+        </li>
+	  </ul>
+	</nav>
+    <main role="main" class="col-md-10 ml-sm-auto">
+	  {{ content }}
+	</main>
+  </div>
 </div>
