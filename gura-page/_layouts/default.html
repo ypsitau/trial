@@ -9,6 +9,114 @@ topdir: ../..
 -->
 <div class="container-fluid">
   <div class="row">
+	<nav class="col-md-2 d-none d-md-block bg-light sidebar">
+	  <div class="list-group list-group-root well">
+
+		<a href="#item-1" class="list-group-item" data-toggle="collapse">
+		  <span class="hoge" data-feather="chevron-right">aaaa</span>
+		  Item 1
+		</a>
+		<div class="list-group collapse" id="item-1">
+		  
+		  <a href="#item-1-1" class="list-group-item" data-toggle="collapse">
+			<span data-feather="chevron-right"></span>Item 1.1
+		  </a>
+		  <div class="list-group collapse" id="item-1-1">
+			<a href="#" class="list-group-item">Item 1.1.1</a>
+			<a href="#" class="list-group-item">Item 1.1.2</a>
+			<a href="#" class="list-group-item">Item 1.1.3</a>
+		  </div>
+		  
+		  <a href="#item-1-2" class="list-group-item" data-toggle="collapse">
+			<span data-feather="chevron-right"></span>Item 1.2
+		  </a>
+		  <div class="list-group collapse" id="item-1-2">
+			<a href="#" class="list-group-item">Item 1.2.1</a>
+			<a href="#" class="list-group-item">Item 1.2.2</a>
+			<a href="#" class="list-group-item">Item 1.2.3</a>
+		  </div>
+		  
+		  <a href="#item-1-3" class="list-group-item" data-toggle="collapse">
+			<span data-feather="chevron-right"></span>Item 1.3
+		  </a>
+		  <div class="list-group collapse" id="item-1-3">
+			<a href="#" class="list-group-item">Item 1.3.1</a>
+			<a href="#" class="list-group-item">Item 1.3.2</a>
+			<a href="#" class="list-group-item">Item 1.3.3</a>
+		  </div>
+		  
+		</div>
+		
+		<a href="#item-2" class="list-group-item" data-toggle="collapse">
+		  <span data-feather="chevron-right"></span>Item 2
+		</a>
+		<div class="list-group collapse" id="item-2">
+		  
+		  <a href="#item-2-1" class="list-group-item" data-toggle="collapse">
+			<span data-feather="chevron-right"></span>Item 2.1
+		  </a>
+		  <div class="list-group collapse" id="item-2-1">
+			<a href="#" class="list-group-item">Item 2.1.1</a>
+			<a href="#" class="list-group-item">Item 2.1.2</a>
+			<a href="#" class="list-group-item">Item 2.1.3</a>
+		  </div>
+		  
+		  <a href="#item-2-2" class="list-group-item" data-toggle="collapse">
+			<span data-feather="chevron-right"></span>Item 2.2
+		  </a>
+		  <div class="list-group collapse" id="item-2-2">
+			<a href="#" class="list-group-item">Item 2.2.1</a>
+			<a href="#" class="list-group-item">Item 2.2.2</a>
+			<a href="#" class="list-group-item">Item 2.2.3</a>
+		  </div>
+		  
+		  <a href="#item-2-3" class="list-group-item" data-toggle="collapse">
+			<span data-feather="chevron-right"></span>Item 2.3
+		  </a>
+		  <div class="list-group collapse" id="item-2-3">
+			<a href="#" class="list-group-item">Item 2.3.1</a>
+			<a href="#" class="list-group-item">Item 2.3.2</a>
+			<a href="#" class="list-group-item">Item 2.3.3</a>
+		  </div>
+		  
+		</div>
+		
+		<a href="#item-3" class="list-group-item" data-toggle="collapse">
+		  <span data-feather="chevron-right"></span>Item 3
+		</a>
+		<div class="list-group collapse" id="item-3">
+		  
+		  <a href="#item-3-1" class="list-group-item" data-toggle="collapse">
+			<span data-feather="chevron-right"></span>Item 3.1
+		  </a>
+		  <div class="list-group collapse" id="item-3-1">
+			<a href="#" class="list-group-item">Item 3.1.1</a>
+			<a href="#" class="list-group-item">Item 3.1.2</a>
+			<a href="#" class="list-group-item">Item 3.1.3</a>
+		  </div>
+		  
+		  <a href="#item-3-2" class="list-group-item" data-toggle="collapse">
+			<span data-feather="chevron-right"></span>Item 3.2
+		  </a>
+		  <div class="list-group collapse" id="item-3-2">
+			<a href="#" class="list-group-item">Item 3.2.1</a>
+			<a href="#" class="list-group-item">Item 3.2.2</a>
+			<a href="#" class="list-group-item">Item 3.2.3</a>
+		  </div>
+		  
+		  <a href="#item-3-3" class="list-group-item" data-toggle="collapse">
+			<span data-feather="chevron-right"></span>Item 3.3
+		  </a>
+		  <div class="list-group collapse" id="item-3-3">
+			<a href="#" class="list-group-item">Item 3.3.1</a>
+			<a href="#" class="list-group-item">Item 3.3.2</a>
+			<a href="#" class="list-group-item">Item 3.3.3</a>
+		  </div>
+		</div>
+	  </div>
+	</nav>
+  </div>
+<!--
     <nav class="col-md-2 d-none d-md-block bg-light sidebar">
 	  <ul class="nav flex-column">
         <li class="nav-item">
@@ -51,6 +159,7 @@ topdir: ../..
         </li>
 	  </ul>
 	</nav>
+-->
     <main role="main" class="col-md-10 ml-sm-auto">
 	  {{ content }}
 	</main>
