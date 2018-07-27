@@ -18,10 +18,6 @@
 	vertical-align: text-bottom;
 }
 
-.just-padding {
-	padding: 15px;
-}
-
 .list-group.list-group-root {
 	padding: 0;
 	overflow: hidden;
@@ -91,6 +87,12 @@ pre {
 
 .list-group-item .glyphicon {
   margin-right: 5px;
+}
+
+.sidebar a {
+	font-size: 80%;
+	color: #000000;
+	border: none;
 }
 
 /* settings for syntax highlighting */
