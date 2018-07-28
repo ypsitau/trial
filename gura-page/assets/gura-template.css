@@ -14,10 +14,6 @@
 	padding: 56px 0 0;	/* Height of navbar */
 }
 
-.fas {
-	vertical-align: text-bottom;
-}
-
 .list-group.list-group-root {
 	padding: 0;
 	overflow: hidden;
@@ -44,8 +40,14 @@
 	padding-left: 45px;
 }
 
-.list-group-item .fas {
+.list-group-item i {
+	vertical-align: text-center;
 	width: 1em;
+	color: #aaaaaa;
+}
+
+.list-group-item i:hover {
+	color: #000000;
 }
 
 body {
@@ -90,7 +92,7 @@ pre {
 }
 
 .sidebar a {
-	font-size: 80%;
+	font-size: 90%;
 	color: #000000;
 	border: none;
 }

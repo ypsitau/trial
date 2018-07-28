@@ -72,7 +72,7 @@ Release notes are available [here](https://github.com/gura-lang/gura/releases).
 
 # Installation
 
-## Windows
+## <i class="fab fa-windows"></i> Windows
 
 It has been confirmed that Gura runs on the following versions of Windows:
 
@@ -120,7 +120,7 @@ If you don't want to modify registries, you can just expand ZIP file
   in some directory and edit PATH environment so that it includes `gura\bin-x86` directory in the expanded content.
 
 
-## Mac OS X
+## <i class="fab fa-apple"></i> Mac OS X
 
 It has been confirmed that Gura runs on the following versions of Mac OS X.
 
@@ -153,7 +153,7 @@ Symbolic link /usr/bin/gura was created.
 </code></pre>
 
 
-## Linux
+## <i class="fab fa-linux"></i> Linux
 
 It has been confirmed that Gura can run on the following distributions of Linux.
 
