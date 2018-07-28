@@ -50,14 +50,26 @@
 	color: #000000;
 }
 
+a {
+	color: #0000cc;
+}
+
 body {
 	padding-top: 56px;	/* Height of navbar */
 }
 
-pre {
+code.highlighter-rouge {
+	color: #000000;
+	border: #cccccc 1px solid;
+	background: #eeeeee;
+	padding: 0 .2em;
+}
+
+pre, pre.highlight {
 	padding: 1em;
 	font-size: 14px;
-	border: #ccccee 1px solid;
+	border: #cccccc 1px solid;
+	background: #eeeeee;
 }
 
 /* settings for list items in sidebar */
@@ -87,7 +99,7 @@ pre {
   padding-left: 45px;
 }
 
-.list-group-item .glyphicon {
+.list-group-item {
   margin-right: 5px;
 }
 

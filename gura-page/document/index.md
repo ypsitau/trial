@@ -3,29 +3,63 @@ layout: default
 lang: en
 title: document
 ---
-<!-- ----------------------------------------------------------------------- -->
 <h1 name="documents">Documents</h1>
 
+<!-- ----------------------------------------------------------------------- -->
+
+<h2 name="documents">Reference</h2>
+
+<table class="table">
+  <thead class="thead-light">
+	<tr><th>Title</th><th>Language</th></tr>
+  </thead>
+
+  <tbody>
+	<tr>
+	  <td>
+		<a href="language-manual/index.html">Gura Language Manual</a>
+		<a href="https://github.com/gura-lang/gura/raw/master/doc/language-manual/gura-lang-e.pdf" class="float-right">
+		  <i class="far fa-file-pdf"></i> PDF
+		</a>
+	  </td>
+	  <td>English</td>
+	</tr>
+
+	<tr>
+	  <td>
+		<a href="library-reference/index.html">Gura Library Reference</a>
+		<a href="https://github.com/gura-lang/gura/raw/master/doc/library-reference/gura-lib-e.pdf" class="float-right">
+		  <i class="far fa-file-pdf"></i> PDF
+		</a>
+	  </td>
+	  <td>English</td>
+	</tr>
+  </tbody>
+</table>
+
+
+<!-- ----------------------------------------------------------------------- -->
+<h2>Articles</h2>
+
 <table class="table">
 <thead class="thead-light">
-<tr><th>Title</th><th>Language</th><th>Format</th></tr>
+<tr><th>Title</th><th>Language</th></tr>
 </thead>
 
 <tbody>
 <tr>
-<td>Gura Language Manual</td><td>English</td>
-<td>
-<a href="https://github.com/gura-lang/gura/raw/master/doc/language-manual/gura-lang-e.pdf">PDF</a> /
-<a href="language-manual/index.html">HTML</a>
-</td>
+<td><a href="articles/Comparison-between-Java8-and-Gura.html">Comparison between Java 8 and Gura</a></td>
+<td>English</td>
 </tr>
 
 <tr>
-<td>Gura Library Reference</td><td>English</td>
-<td>
-<a href="https://github.com/gura-lang/gura/raw/master/doc/library-reference/gura-lib-e.pdf">PDF</a> /
-<a href="library-reference/index.html">HTML</a>
-</td>
+<td><a href="articles/Script-to-Generate-Prime-Numbers.html">Script to Generate Prime Numbers</a></td>
+<td>English</td>
+</tr>
+
+<tr>
+<td><a href="articles/Database-Access.html">Database Access</a></td>
+<td>English</td>
 </tr>
 </tbody>
 
@@ -33,38 +67,7 @@ title: document
 
 
 <!-- ----------------------------------------------------------------------- -->
-<h1>Articles</h1>
-
-<table class="table">
-<thead class="thead-light">
-<tr><th>Title</th><th>Language</th><th>Format</th></tr>
-</thead>
-
-<tbody>
-<tr>
-<td>Comparison between Java 8 and Gura</td>
-<td>English</td>
-<td><a href="articles/Comparison-between-Java8-and-Gura.html">HTML</a></td>
-</tr>
-
-<tr>
-<td>Script to Generate Prime Numbers</td>
-<td>English</td>
-<td><a href="articles/Script-to-Generate-Prime-Numbers.html">HTML</a></td>
-</tr>
-
-<tr>
-<td>Database Access</td>
-<td>English</td>
-<td><a href="articles/Database-Access.html">HTML</a></td>
-</tr>
-</tbody>
-
-</table>
-
-
-<!-- ----------------------------------------------------------------------- -->
-<h1 name="presentation">Presentation Materials</h1>
+<h2 name="presentation">Presentation Materials</h2>
 
 <table class="table">
 <thead class="thead-light">
@@ -89,7 +92,7 @@ Introduction to Gura Programming Language
 
 
 <!-- ----------------------------------------------------------------------- -->
-<h1>Sample Code</h1>
+<h2>Sample Code</h2>
 
 <p>Sample codes of Gura are stored in
 <a href="https://github.com/gura-lang/gura/tree/master/sample"
