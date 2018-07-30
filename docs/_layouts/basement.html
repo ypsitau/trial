@@ -14,20 +14,20 @@
   </head>
   <body>
 	<nav class="navbar navbar-expand-sm navbar-dark bg-dark fixed-top">
-	  <a class="navbar-brand" href="/">Gura</a>
+	  <a class="navbar-brand" href="{{ topdir }}/">Gura</a>
 	  <div class="collapse navbar-collapse" id="navbarsExample03">
 		<ul class="navbar-nav mr-auto">
-		  <li class="nav-item{% if page.url == "/" %} active{% endif %}">
-			<a class="nav-link" href="/">Home <span class="sr-only">(current)</span></a>
+		  <li class="nav-item{% if page.url == "{{ topdir }}/" %} active{% endif %}">
+			<a class="nav-link" href="{{ topdir }}/">Home <span class="sr-only">(current)</span></a>
 		  </li>
 		  <li class="nav-item">
-			<a class="nav-link{% if page.url contains "/document/" %} active{% endif %}" href="/document/">Document</a>
+			<a class="nav-link{% if page.url contains "/document/" %} active{% endif %}" href="{{ topdir }}/document/">Document</a>
 		  </li>
 		  <li class="nav-item">
-			<a class="nav-link{% if page.url contains "/download/" %} active{% endif %}" href="/download/">Download</a>
+			<a class="nav-link{% if page.url contains "/download/" %} active{% endif %}" href="{{ topdir }}/download/">Download</a>
 		  </li>
 		  <li class="nav-item">
-			<a class="nav-link{% if page.url contains "/gallery/" %} active{% endif %}" href="/gallery/">Gallery</a>
+			<a class="nav-link{% if page.url contains "/gallery/" %} active{% endif %}" href="{{ topdir }}/gallery/">Gallery</a>
 		  </li>
 		</ul>
 	  </div>
